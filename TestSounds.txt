@@ -1,0 +1,2 @@
+It is possible to configure Visual Studio to play a failure and success sound when tests have been run.
+Attached are two suggested sounds, I implore you to set this feature up (it will improve your life greatly)
