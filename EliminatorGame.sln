@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eliminator", "Eliminator\Eliminator.csproj", "{AF53413E-CA5F-461F-B383-DB637404D6E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eliminator.Test", "Eliminator.Test\Eliminator.Test.csproj", "{4FDA87F2-9637-4B30-B130-10E6BA8D3523}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eliminator.Client", "Eliminator.Client\Eliminator.Client.csproj", "{53F2C465-3E45-4AC2-9151-36002168EF05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eliminator.Server", "Eliminator.Server\Eliminator.Server.csproj", "{A5B8231A-E96E-497B-909E-8747B89A1F16}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestSounds", "TestSounds", "{0D1F029A-7F4D-408E-8EF5-79B3B8BCC9D0}"
+	ProjectSection(SolutionItems) = preProject
+		D:\Will\Python Code\PythonApplication1\puzzleGame\sounds\fightWin.wav = D:\Will\Python Code\PythonApplication1\puzzleGame\sounds\fightWin.wav
+		D:\Will\Python Code\PythonApplication1\puzzleGame\sounds\hurtSound.wav = D:\Will\Python Code\PythonApplication1\puzzleGame\sounds\hurtSound.wav
+		TestSounds.txt = TestSounds.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EliminatorApp.Test", "EliminatorApp.Test\EliminatorApp.Test.csproj", "{8BCFD4E9-9CD0-46A1-90FB-DA57C773A7DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EliminatorApp", "EliminatorApp\EliminatorApp.csproj", "{9AF2FC48-A2B3-8EC1-B9D0-C19CB35DB04A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF53413E-CA5F-461F-B383-DB637404D6E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF53413E-CA5F-461F-B383-DB637404D6E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF53413E-CA5F-461F-B383-DB637404D6E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF53413E-CA5F-461F-B383-DB637404D6E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FDA87F2-9637-4B30-B130-10E6BA8D3523}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FDA87F2-9637-4B30-B130-10E6BA8D3523}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FDA87F2-9637-4B30-B130-10E6BA8D3523}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FDA87F2-9637-4B30-B130-10E6BA8D3523}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53F2C465-3E45-4AC2-9151-36002168EF05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53F2C465-3E45-4AC2-9151-36002168EF05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53F2C465-3E45-4AC2-9151-36002168EF05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53F2C465-3E45-4AC2-9151-36002168EF05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5B8231A-E96E-497B-909E-8747B89A1F16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5B8231A-E96E-497B-909E-8747B89A1F16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5B8231A-E96E-497B-909E-8747B89A1F16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5B8231A-E96E-497B-909E-8747B89A1F16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BCFD4E9-9CD0-46A1-90FB-DA57C773A7DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BCFD4E9-9CD0-46A1-90FB-DA57C773A7DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BCFD4E9-9CD0-46A1-90FB-DA57C773A7DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BCFD4E9-9CD0-46A1-90FB-DA57C773A7DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AF2FC48-A2B3-8EC1-B9D0-C19CB35DB04A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AF2FC48-A2B3-8EC1-B9D0-C19CB35DB04A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AF2FC48-A2B3-8EC1-B9D0-C19CB35DB04A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AF2FC48-A2B3-8EC1-B9D0-C19CB35DB04A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0D1F029A-7F4D-408E-8EF5-79B3B8BCC9D0} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0F4C241E-44D9-4E82-A729-70A654BE96A0}
+	EndGlobalSection
+EndGlobal
