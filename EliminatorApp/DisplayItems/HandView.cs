@@ -50,7 +50,7 @@ public class HandView: ICardContainer, IButton
     /// <param name="space"></param>
     /// <param name="handId"></param>
     public HandView(
-        IEnumerable<Card> cards,
+        IEnumerable<ICard> cards,
         RenderTarget2D view,
         DisplaySpace space,
         byte handId)
@@ -60,7 +60,7 @@ public class HandView: ICardContainer, IButton
         HandID = handId;
         ButtonId = new();
 
-        foreach (Card card in cards)
+        foreach (ICard card in cards)
         {
             _ = AddFixedCard(card);
         }
@@ -71,7 +71,7 @@ public class HandView: ICardContainer, IButton
     /// </summary>
     /// <param name="card"> The <see cref="Card"/> that the <see cref="FixedCard"/> that will be removed represents </param>
     /// <returns> Whether the <see cref="Card"/> was found and by extension whether the <see cref="FixedCard"/> was removed </returns>
-    public bool RemoveFixedCard(Card card)
+    public bool RemoveFixedCard(ICard card)
     {
         if (!_displayCards.Select(dcard => dcard.RepresentedCard.Id).Contains(card.Id))
         {
@@ -108,7 +108,7 @@ public class HandView: ICardContainer, IButton
     /// </summary>
     /// <param name="card"> The <see cref="Card"/> to make a <see cref="FixedCard"/> from </param>
     /// <returns> The <see cref="FixedCard"/> instance that was just added </returns>
-    public FixedCard AddFixedCard(Card card)
+    public FixedCard AddFixedCard(ICard card)
     {
         (DisplaySpace space, var index) = TakeNextInternalSpace();
 

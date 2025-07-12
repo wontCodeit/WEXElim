@@ -14,8 +14,8 @@ internal class MockClientGameManager: IClientGameManager
     {
         Name = userName;
         PlayerId = id;
-        HandManager = new((byte)igPacket.Players.Count, igPacket.StartingCards, new BlankDeck(1));
-        _serverHM = new((byte)igPacket.Players.Count, igPacket.StartingCards, new Deck(1));
+        HandManager = new((byte)igPacket.Players.Count, igPacket.StartingCards, new BlankDeck(1), new CardCounter());
+        _serverHM = new((byte)igPacket.Players.Count, igPacket.StartingCards, new Deck(1), new CardCounter());
     }
 
     public HandManager? HandManager { get; private set; }

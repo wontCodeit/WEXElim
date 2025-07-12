@@ -27,7 +27,7 @@ public class FixedCard: IButton
     /// <summary>
     /// The <see cref="Card"/> that this <see cref="FixedCard"/> represents
     /// </summary>
-    public Card RepresentedCard { get; }
+    public ICard RepresentedCard { get; }
 
     /// <summary>
     /// Set to true to prevent this <see cref="FixedCard"/> being drawn
@@ -51,7 +51,7 @@ public class FixedCard: IButton
     /// </summary>
     /// <param name="card"> The card that this instance will represent </param>
     /// <param name="displaySpace"> The space this card will initially occupy </param>
-    public FixedCard(Card card, DisplaySpace displaySpace)
+    public FixedCard(ICard card, DisplaySpace displaySpace)
     {
         RepresentedCard = card;
         DisplaySpace = displaySpace;

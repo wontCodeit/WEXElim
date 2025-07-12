@@ -11,8 +11,8 @@ public class HandManagerTests
     [Fact]
     public void HandIndexingTest()
     {
-        Card.Reset();
-        HandManager handManager = new(5, 5, new Deck(1));
+        var cardCounter = new CardCounter();
+        HandManager handManager = new(5, 5, new Deck(1), cardCounter);
         List<byte> playerIndexes = handManager.PlayerIds();
         List<ushort> cardIndexes = [];
         playerIndexes.ForEach(i =>
@@ -35,12 +35,12 @@ public class HandManagerTests
     [Fact]
     public void QuickPlaceValidTest()
     {
-        Card.Reset();
-        HandManager handManager = new(1, 2, new Deck(1));
-        List<Card> cards = handManager.GetCardsInHand(0);
+        var cardCounter = new CardCounter();
+        HandManager handManager = new(1, 2, new Deck(1), cardCounter);
+        List<ICard> cards = handManager.GetCardsInHand(0);
         var cardIds = cards.Select(card => card.Id).ToList();
         var cardToPlace = cardIds[0];
-        var cardValue = (CardValue)Card.GetNumber(cardToPlace)!;
+        var cardValue = (CardValue)cardCounter.GetNumber(cardToPlace)!;
         handManager.ToDiscard(cardValue);
 
         Assert.True(handManager.QuickPlace(cardIds[0]));
@@ -57,11 +57,11 @@ public class HandManagerTests
     [Fact]
     public void QuickPlaceInvalidTest()
     {
-        Card.Reset();
-        HandManager handManager = new(1, 2, new Deck(1));
+        var cardCounter = new CardCounter();
+        HandManager handManager = new(1, 2, new Deck(1), cardCounter);
         var cardIds = handManager.GetCardsInHand(0).Select(card => card.Id).ToList();
         var cardToPlace = cardIds[0];
-        var cardValue = (CardValue)Card.GetNumber((ushort)(cardToPlace + 1))!;
+        var cardValue = (CardValue)cardCounter.GetNumber((ushort)(cardToPlace + 1))!;
         handManager.ToDiscard(cardValue);
 
         Assert.False(handManager.QuickPlace(cardIds[0]));
@@ -79,15 +79,15 @@ public class HandManagerTests
     [Fact]
     public void ScrambleTest()
     {
-        Card.Reset();
-        HandManager handManager = new(1, 54, new Deck(1));
+        var cardCounter = new CardCounter();
+        HandManager handManager = new(1, 54, new Deck(1), cardCounter);
         var cardIds = handManager.GetCardsInHand(0).Select(card => card.Id).ToList();
         List<(ushort, CardValue)> cards = [];
 
         cards.Clear();
         cardIds.ForEach(id =>
         {
-            cards.Add((id, (CardValue)Card.GetNumber(id)!));
+            cards.Add((id, (CardValue)cardCounter.GetNumber(id)!));
         });
 
         handManager.Scramble(0);
@@ -95,7 +95,7 @@ public class HandManagerTests
         List<(int, CardValue)> newCardPairings = [];
         cardIds.ForEach(id =>
         {
-            newCardPairings.Add((id, (CardValue)Card.GetNumber(id)!));
+            newCardPairings.Add((id, (CardValue)cardCounter.GetNumber(id)!));
         });
 
         var areEqual = true;
@@ -119,10 +119,10 @@ public class HandManagerTests
     [Fact]
     public void SwapTest()
     {
-        Card.Reset();
-        HandManager handManager = new(2, 1, new Deck(1));
-        Card card1 = handManager.GetCardsInHand(0).First();
-        Card card2 = handManager.GetCardsInHand(1).First();
+        var cardCounter = new CardCounter();
+        HandManager handManager = new(2, 1, new Deck(1), cardCounter);
+        ICard card1 = handManager.GetCardsInHand(0).First();
+        ICard card2 = handManager.GetCardsInHand(1).First();
         var card1OriginalVal = (CardValue)card1.Number!;
         var card2OriginalVal = (CardValue)card2.Number!;
         handManager.Swap(card1.Id, card2.Id);
@@ -138,8 +138,8 @@ public class HandManagerTests
     [Fact]
     public void HandHasValueTest()
     {
-        Card.Reset();
-        HandManager handManager = new(1, 54, new Deck(1));
+        var cardCounter = new CardCounter();
+        HandManager handManager = new(1, 54, new Deck(1), cardCounter);
 
         Assert.Equal(0, handManager.CalculateHandValues().First().Item1);
         Assert.Equal(TOTAL_DECK_VALUE, handManager.CalculateHandValues().First().Item2);
@@ -153,13 +153,13 @@ public class HandManagerTests
     [Fact]
     public void DrawStoredAsHeldTest()
     {
-        Card.Reset();
-        HandManager handManager = new(1, 4, new Deck(1));
-        Assert.Null(Card.GetNumber(handManager.HeldCardId));
+        var cardCounter = new CardCounter();
+        HandManager handManager = new(1, 4, new Deck(1), cardCounter);
+        Assert.Null(cardCounter.GetNumber(handManager.HeldCardId));
 
         handManager.DrawCard();
 
-        CardValue? number = Card.GetNumber(handManager.HeldCardId);
+        CardValue? number = cardCounter.GetNumber(handManager.HeldCardId);
 
         Assert.NotNull(number);
     }
@@ -172,14 +172,14 @@ public class HandManagerTests
     [Fact]
     public void SwapHeldTest()
     {
-        Card.Reset();
-        HandManager handManager = new(2, 4, new Deck(1));
+        var cardCounter = new CardCounter();
+        HandManager handManager = new(2, 4, new Deck(1), cardCounter);
         handManager.DrawCard();
-        var drawnValue = (CardValue)Card.GetNumber(handManager.HeldCardId)!;
-        Card cardToSwap = handManager.GetCardsInHand(0).First();
+        var drawnValue = (CardValue)cardCounter.GetNumber(handManager.HeldCardId)!;
+        ICard cardToSwap = handManager.GetCardsInHand(0).First();
         CardValue? handCardValue = cardToSwap.Number;
         handManager.Swap(cardToSwap.Id, handManager.HeldCardId);
         Assert.Equal(drawnValue, cardToSwap.Number);
-        Assert.Equal(handCardValue, (CardValue)Card.GetNumber(handManager.HeldCardId)!);
+        Assert.Equal(handCardValue, (CardValue)cardCounter.GetNumber(handManager.HeldCardId)!);
     }
 }

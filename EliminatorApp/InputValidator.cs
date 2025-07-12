@@ -161,7 +161,7 @@ public class InputValidator
         }
     }
 
-    private List<Card> GetCardsInHand(byte userId) => _handManager.GetCardsInHand(userId);
+    private List<ICard> GetCardsInHand(byte userId) => _handManager.GetCardsInHand(userId);
 
     private byte GetNextPlayerId(byte currentPlayerId)
     {

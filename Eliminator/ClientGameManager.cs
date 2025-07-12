@@ -14,6 +14,7 @@ namespace Eliminator;
 public class ClientGameManager: IClientGameManager
 {
     private readonly ServerAccess _serverAccess;
+    private readonly CardCounter _counter = new();
     private bool disposedValue;
 
     /// <summary>
@@ -129,7 +130,7 @@ public class ClientGameManager: IClientGameManager
             return;
         }
 
-        HandManager = new((byte)igPacket.Players.Count, igPacket.StartingCards, new BlankDeck(igPacket.DeckSize));
+        HandManager = new((byte)igPacket.Players.Count, igPacket.StartingCards, new BlankDeck(igPacket.DeckSize), _counter);
     }
 
     private void OnStartTurn(object? sender, ProcessedStartTurnPacket? stPacket)
@@ -153,7 +154,7 @@ public class ClientGameManager: IClientGameManager
         }
 
         HandManager.DrawCard();
-        Card.ChangePlaceholderNumber(HandManager.HeldCardId, drPacket.CardValue);
+        _counter.ChangePlaceholderNumber(HandManager.HeldCardId, drPacket.CardValue);
     }
     protected virtual void Dispose(bool disposing)
     {

@@ -9,6 +9,7 @@ public class HostGameManager
 {
     private readonly HandManager _handManager;
     private readonly ServerTcp _server;
+    private readonly CardCounter _counter;
     private int _turnTimeLimit = 30;
     private List<byte> _playerIds = [];
     private bool _run = false;
@@ -18,9 +19,10 @@ public class HostGameManager
     private IEnumerable<CardAction> _expectedCardActions = [CardAction.None];
     private DateTime _currentTurnEndTime = DateTime.UtcNow;
 
-    public HostGameManager(HandManager handManager, ServerTcp server)
+    public HostGameManager(HandManager handManager, CardCounter counter, ServerTcp server)
     {
         _handManager = handManager;
+        _counter = counter;
         _server = server;
     }
 
@@ -150,8 +152,6 @@ public class HostGameManager
                     continue;
             }
         }
-
-        Card.Reset();
     }
 
     private void HandleCall(ProcessedCallItPacket? cPacket)
@@ -209,7 +209,7 @@ public class HostGameManager
         SendToWaitingPlayers(PacketWriter.WriteDisplayDrawPacket());
         _server.BroadcastSpecific(
             [_turnPlayerId],
-            PacketWriter.WriteDrawResultPacket((CardValue)Card.GetNumber(_handManager.HeldCardId)!));
+            PacketWriter.WriteDrawResultPacket((CardValue)_counter.GetNumber(_handManager.HeldCardId)!));
     }
 
     private void HandlePeek(ProcessedPeekPacket? pPacket)
@@ -240,7 +240,7 @@ public class HostGameManager
         _expectedCardActions = [CardAction.None];
         _server.BroadcastSpecific(
             [_turnPlayerId],
-            PacketWriter.WritePeekResultPacket((CardValue)Card.GetNumber(pPacket.CardId)!));
+            PacketWriter.WritePeekResultPacket((CardValue)_counter.GetNumber(pPacket.CardId)!));
         SendToWaitingPlayers(PacketWriter.WriteDisplayPeekPacket(pPacket.CardId));
     }
 
@@ -299,7 +299,7 @@ public class HostGameManager
         }
 
         _handManager.DiscardHeldCard();
-        var discardedVal = (CardValue)Card.GetNumber(_handManager.TopDiscardCardId)!;
+        var discardedVal = (CardValue)_counter.GetNumber(_handManager.TopDiscardCardId)!;
         _expectedCardActions = [discardedVal.GetCardAction()];
         _server.BroadcastSpecific([_turnPlayerId], PacketWriter.WriteDiscardResultPacket(discardedVal));
     }
@@ -363,7 +363,7 @@ public class HostGameManager
         // Need to get every client on the same page with what card is trying to be quick placed so it can be displayed
         SendToWaitingPlayers(PacketWriter.WriteQuickPlacePacket(qpPacket.CardId, qpPacket.SeenDiscard));
 
-        var placedVal = (CardValue)Card.GetNumber(qpPacket.CardId)!;
+        var placedVal = (CardValue)_counter.GetNumber(qpPacket.CardId)!;
         var success = _handManager.QuickPlace(qpPacket.CardId);
         if (success)
         {
@@ -428,7 +428,7 @@ public class HostGameManager
 
         foreach (var pId in _playerIds)
         {
-            List<Card> cards = _handManager.GetCardsInHand(pId);
+            List<ICard> cards = _handManager.GetCardsInHand(pId);
             // have to do this strangeness because FirstOrDefault makes a Card instead of a null
             if (cards.Any(card => card.Id == cardId))
             {
