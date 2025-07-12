@@ -15,8 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestSounds", "TestSounds", "{0D1F029A-7F4D-408E-8EF5-79B3B8BCC9D0}"
 	ProjectSection(SolutionItems) = preProject
-		D:\Will\Python Code\PythonApplication1\puzzleGame\sounds\fightWin.wav = D:\Will\Python Code\PythonApplication1\puzzleGame\sounds\fightWin.wav
-		D:\Will\Python Code\PythonApplication1\puzzleGame\sounds\hurtSound.wav = D:\Will\Python Code\PythonApplication1\puzzleGame\sounds\hurtSound.wav
+		fightWin.wav = fightWin.wav
+		hurtSound.wav = hurtSound.wav
 		TestSounds.txt = TestSounds.txt
 	EndProjectSection
 EndProject

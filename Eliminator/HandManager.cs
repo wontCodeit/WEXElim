@@ -8,9 +8,10 @@ namespace Eliminator;
 /// </summary>
 public class HandManager
 {
+    private readonly CardCounter _counter;
     private readonly Stack<CardValue> _discardBuffer = [];
     //                                  PlayerId       CardId
-    private readonly ReadOnlyDictionary<byte, List<Card>> _playerHands;
+    private readonly ReadOnlyDictionary<byte, List<ICard>> _playerHands;
     public IDeck Deck { get; private set; }
 
     /// <summary>
@@ -36,7 +37,7 @@ public class HandManager
     /// <param name="playerCount"> How many players to track hands for </param>
     /// <param name="startingCards"> The initial hand of cards each is dealt </param>
     /// <param name="deck"> The <see cref="Eliminator.Deck"/> that this <see cref="HandManager"/> should use </param>
-    public HandManager(byte playerCount, int startingCards, IDeck deck)
+    public HandManager(byte playerCount, int startingCards, IDeck deck, CardCounter cardCounter)
     {
         Debug.Assert(playerCount > 0
             && startingCards > 0,
@@ -44,17 +45,18 @@ public class HandManager
         Debug.Assert(playerCount * startingCards <= deck.Remaining,
             "Cannot deal out more cards than there are in the deck");
 
-        HeldCardId = Card.AddPlaceholder();
-        TopDiscardCardId = Card.AddPlaceholder();
+        _counter = cardCounter;
+        HeldCardId = _counter.AddPlaceholder();
+        TopDiscardCardId = _counter.AddPlaceholder();
 
         InitialisationInfo = (playerCount, startingCards, deck.StandardSizeMultiple);
-        Dictionary<byte, List<Card>> tempDict = [];
+        Dictionary<byte, List<ICard>> tempDict = [];
         for (byte i = 0; i < playerCount; i++)
         {
-            var someDict = new List<Card>();
+            var someDict = new List<ICard>();
             for (var j = 0; j < startingCards; j++)
             {
-                someDict.Add(new(deck.Draw()));
+                someDict.Add(_counter.MakeNewCard(deck.Draw()));
             }
 
             tempDict.Add(i, someDict);
@@ -71,7 +73,7 @@ public class HandManager
     public void ToDiscard(CardValue cardValue)
     {
         _discardBuffer.Push(cardValue);
-        Card.ChangePlaceholderNumber(TopDiscardCardId, _discardBuffer.Peek());
+        _counter.ChangePlaceholderNumber(TopDiscardCardId, _discardBuffer.Peek());
     }
 
     /// <summary>
@@ -80,7 +82,7 @@ public class HandManager
     /// <exception cref="InvalidOperationException"> Thrown if deck has no cards left </exception>
     public void DrawCard()
     {
-        Card.ChangePlaceholderNumber(HeldCardId, Deck.Draw());
+        _counter.ChangePlaceholderNumber(HeldCardId, Deck.Draw());
     }
 
     /// <summary>
@@ -89,10 +91,10 @@ public class HandManager
     /// <returns></returns>
     public void DiscardHeldCard()
     {
-        CardValue? cardValue = Card.GetNumber(HeldCardId);
+        CardValue? cardValue = _counter.GetNumber(HeldCardId);
         Debug.Assert(cardValue != null, "Can't DiscardHeldCard when nothing is drawn");
         ToDiscard((CardValue)cardValue);
-        Card.ChangePlaceholderNumber(HeldCardId, null);
+        _counter.ChangePlaceholderNumber(HeldCardId, null);
     }
 
     /// <summary>
@@ -110,9 +112,9 @@ public class HandManager
     /// <param name="playerId"> Id of the player who should have their hand looked at </param>
     /// <returns> The id of every card in the given player's hand </returns>
     /// <exception cref="ArgumentException"> Thrown when the player can't be found </exception>
-    public List<Card> GetCardsInHand(byte playerId)
+    public List<ICard> GetCardsInHand(byte playerId)
     {
-        return _playerHands.TryGetValue(playerId, out List<Card>? hand)
+        return _playerHands.TryGetValue(playerId, out List<ICard>? hand)
             ? hand
             : throw new ArgumentException($"Player hand with id: {playerId} could not be found");
     }
@@ -185,9 +187,9 @@ public class HandManager
     /// <param name="cardId"> The id of the <see cref="Card"/> that is in a hand </param>
     private void SwapWithHeldCard(ushort cardId)
     {
-        Card? card = null;
+        ICard? card = null;
 
-        foreach (List<Card> hand in _playerHands.Values)
+        foreach (List<ICard> hand in _playerHands.Values)
         {
             card = hand.FirstOrDefault(card => card.Id == cardId);
             if (card != null)
@@ -201,13 +203,13 @@ public class HandManager
             throw new InvalidOperationException($"Could not find the card with given id: {cardId}");
         }
 
-        if (Card.GetNumber(HeldCardId) is null)
+        if (_counter.GetNumber(HeldCardId) is null)
         {
             throw new InvalidOperationException($"No held card exists");
         }
 
-        var heldCardVal = (CardValue)Card.GetNumber(HeldCardId)!;
-        Card.ChangePlaceholderNumber(HeldCardId, card?.Number);
+        var heldCardVal = (CardValue)_counter.GetNumber(HeldCardId)!;
+        _counter.ChangePlaceholderNumber(HeldCardId, card?.Number);
         card?.ChangeNumber(heldCardVal);
     }
 
@@ -217,9 +219,9 @@ public class HandManager
     /// <param name="cardId"> the id of the <see cref="Card"/> that is in a hand </param>
     private void SwapWithDiscard(ushort cardId)
     {
-        Card? card = null;
+        ICard? card = null;
 
-        foreach (List<Card> hand in _playerHands.Values)
+        foreach (List<ICard> hand in _playerHands.Values)
         {
             card = hand.FirstOrDefault(card => card.Id == cardId);
         }
@@ -229,13 +231,13 @@ public class HandManager
             throw new InvalidOperationException($"Could not find the card with given id: {cardId}");
         }
 
-        if (Card.GetNumber(TopDiscardCardId) is null)
+        if (_counter.GetNumber(TopDiscardCardId) is null)
         {
             throw new InvalidOperationException($"Discard pile is empty");
         }
 
         ToDiscard((CardValue)card?.Number!);
-        card?.ChangeNumber((CardValue)Card.GetNumber(TopDiscardCardId)!);
+        card?.ChangeNumber((CardValue)_counter.GetNumber(TopDiscardCardId)!);
     }
 
     /// <summary>
@@ -243,9 +245,9 @@ public class HandManager
     /// </summary>
     private void SwapBothPlaceholders()
     {
-        CardValue? valueToDiscard = Card.GetNumber(HeldCardId);
+        CardValue? valueToDiscard = _counter.GetNumber(HeldCardId);
         Debug.Assert(valueToDiscard != null, "Can't discard a placeholder with no value!");
-        Card.ChangePlaceholderNumber(HeldCardId, null);
+        _counter.ChangePlaceholderNumber(HeldCardId, null);
         _discardBuffer.Push((CardValue)valueToDiscard);
     }
 
@@ -257,10 +259,10 @@ public class HandManager
     /// <exception cref="InvalidOperationException"> Thrown if the <see cref="Card"/>s can't be found </exception>
     private void SwapNoPlaceholders(ushort cardOneId, ushort cardTwoId)
     {
-        Card? card1 = null;
-        Card? card2 = null;
+        ICard? card1 = null;
+        ICard? card2 = null;
 
-        foreach (List<Card> hand in _playerHands.Values)
+        foreach (List<ICard> hand in _playerHands.Values)
         {
             // have to do this strangeness because FirstOrDefault makes a Card instead of a null
             if (hand.Any(card => card.Id == cardOneId))
@@ -295,7 +297,7 @@ public class HandManager
     /// <exception cref="ArgumentException"> If the given player hand is not found, exception thrown. </exception>
     public void Scramble(byte playerId)
     {
-        if (!_playerHands.TryGetValue(playerId, out List<Card>? hand))
+        if (!_playerHands.TryGetValue(playerId, out List<ICard>? hand))
         {
             throw new ArgumentException($"Player hand with id: {playerId} could not be found");
         }
@@ -321,12 +323,12 @@ public class HandManager
     /// <exception cref="ArgumentException"> If the given card id is not found, exception thrown. </exception>
     public bool QuickPlace(ushort cardId)
     {
-        List<Card>? hand = null;
-        Card? cardToPlace = null;
+        List<ICard>? hand = null;
+        ICard? cardToPlace = null;
 
-        foreach (KeyValuePair<byte, List<Card>> searchHand in _playerHands)
+        foreach (KeyValuePair<byte, List<ICard>> searchHand in _playerHands)
         {
-            List<Card> consideredHand = searchHand.Value;
+            List<ICard> consideredHand = searchHand.Value;
             consideredHand.ForEach(card =>
             {
                 if (card.Id == cardId)
@@ -347,13 +349,13 @@ public class HandManager
             throw new ArgumentException($"Requested card with id: {cardId} could not be found");
         }
 
-        if (Card.GetNumber(TopDiscardCardId) != cardToPlace?.Number)
+        if (_counter.GetNumber(TopDiscardCardId) != cardToPlace?.Number)
         {
             return false;
         }
 
         ToDiscard((CardValue)cardToPlace?.Number!);
-        return hand.Remove((Card)cardToPlace!);
+        return hand.Remove(cardToPlace!);
     }
 
     /// <summary>
@@ -365,12 +367,12 @@ public class HandManager
     /// <exception cref="InvalidOperationException"> Thrown if the deck has no cards left </exception>
     public ushort PunishPlayer(byte handId)
     {
-        if (!_playerHands.TryGetValue(handId, out List<Card>? hand))
+        if (!_playerHands.TryGetValue(handId, out List<ICard>? hand))
         {
             throw new ArgumentException($"Requested hand with id: {handId} could not be found");
         }
 
-        hand?.Add(new(Deck.Draw()));
+        hand?.Add(_counter.MakeNewCard(Deck.Draw()));
 
         return (ushort)hand?.Last().Id!;
     }
@@ -387,7 +389,7 @@ public class HandManager
     public List<(byte, int)> CalculateHandValues()
     {
         var playerHandValues = new List<(byte, int)>();
-        foreach (KeyValuePair<byte, List<Card>> hand in _playerHands)
+        foreach (KeyValuePair<byte, List<ICard>> hand in _playerHands)
         {
             var handSum = 0;
             hand.Value.ToList().ForEach(card =>

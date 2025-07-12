@@ -384,15 +384,16 @@ public class Game1: Game
 
     private void OnDeckClicked(object? sender, EventArgs e)
     {
-        _gameStateMachine.FireDeckClickTrigger();
         if (_gameStateMachine.CurrentState == GameState.TurnStart)
         {
+            _gameStateMachine.FireDeckClickTrigger();
             _serverComm.SendDrawPacket();
             return;
         }
 
         if (_gameStateMachine.CurrentState == GameState.QuickPlace)
         {
+            // We are not triggering deck click here, because when in QP only the next CardAction (or cancel) is relevant to the state machine
             _serverComm.SendQuickPlacePacket((ushort)InputRegistry.First().ButtonId.Value);
         }
     }
