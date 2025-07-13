@@ -205,7 +205,7 @@ public class PacketReader: BinaryReader
 
     private void ReadQuickPlaceResult()
     {
-        var result = (QuickPlaceSuccess)ReadByte();
+        var result = (QuickPlaceResult)ReadByte();
         var playerId = ReadByte();
         var cardValue = (CardValue)ReadByte();
         _waitingPackets.Enqueue(new

@@ -135,7 +135,7 @@ public static class PacketWriter
     /// <param name="playerId"> Id of who attempted the QuickPlace </param>
     /// <param name="cardValue"> Success or fail, everyone sees what the quick placed card value was </param>
     /// <returns> The packet as a <see cref="byte"/> array </returns>
-    public static byte[] WriteQuickPlaceResultPacket(QuickPlaceSuccess result, byte playerId, CardValue cardValue)
+    public static byte[] WriteQuickPlaceResultPacket(QuickPlaceResult result, byte playerId, CardValue cardValue)
     {
         WriteToPacket(OpCode.QuickPlaceResult);
         WriteToPacket((byte)result);

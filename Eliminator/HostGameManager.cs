@@ -241,6 +241,9 @@ public class HostGameManager
         _server.BroadcastSpecific(
             [_turnPlayerId],
             PacketWriter.WritePeekResultPacket((CardValue)_counter.GetNumber(pPacket.CardId)!));
+        // TODO: It makes much more sense to simply send a DisplayPeek packet to all players and respond to it
+        // Not a big deal as client can use ReadInternalPacket to mimic this behaviour, but this seems just confusing for no reason.
+        // Same with many other places where I've used "SendToWaitingPlayers"
         SendToWaitingPlayers(PacketWriter.WriteDisplayPeekPacket(pPacket.CardId));
     }
 
@@ -368,7 +371,7 @@ public class HostGameManager
         if (success)
         {
             _server.BroadcastAll(PacketWriter.WriteQuickPlaceResultPacket
-                (QuickPlaceSuccess.Success,
+                (QuickPlaceResult.Success,
                 qpPacket.SenderId,
                 placedVal));
             _expectedCardActions = [placedVal.GetCardAction()];
@@ -378,7 +381,7 @@ public class HostGameManager
         if (placedVal == qpPacket.SeenDiscard)
         {
             _server.BroadcastAll(PacketWriter.WriteQuickPlaceResultPacket
-                (QuickPlaceSuccess.TooLate,
+                (QuickPlaceResult.TooLate,
                 qpPacket.SenderId,
                 placedVal));
             return;
@@ -386,7 +389,7 @@ public class HostGameManager
 
         _ = _handManager.PunishPlayer(qpPacket.SenderId); // Ids SHOULD be consistent across client and servers (always ticking up by one)
         _server.BroadcastAll(PacketWriter.WriteQuickPlaceResultPacket
-            (QuickPlaceSuccess.Failure,
+            (QuickPlaceResult.Failure,
             qpPacket.SenderId,
             placedVal));
         return;

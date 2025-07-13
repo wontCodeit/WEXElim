@@ -116,6 +116,18 @@ public class Game1: Game
             }
         };
 
+        _serverComm.DiscardResultEvent += (object? sender, ProcessedDiscardResultPacket? packet) =>
+        {
+            if (packet == null)
+            {
+                Debug.WriteLine("Bad ProcessedDiscardResultPacket received");
+                return;
+            }
+
+            _debugString = "ProcessedDiscardResultPacket received, fired trigger on state machine";
+            _gameStateMachine.FireDoCardActionTrigger(packet!.CardValue.GetCardAction());
+        };
+
         _gameStateMachine.StateChanged += UpdateValidInputs;
         UpdateValidInputs(_gameStateMachine, _gameStateMachine.CurrentState);
 
