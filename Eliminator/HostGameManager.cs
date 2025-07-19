@@ -242,8 +242,9 @@ public class HostGameManager
             [_turnPlayerId],
             PacketWriter.WritePeekResultPacket((CardValue)_counter.GetNumber(pPacket.CardId)!));
         // TODO: It makes much more sense to simply send a DisplayPeek packet to all players and respond to it
-        // Not a big deal as client can use ReadInternalPacket to mimic this behaviour, but this seems just confusing for no reason.
-        // Same with many other places where I've used "SendToWaitingPlayers"
+        // HOWEVER, in this case the player who peeked gets to see a card, and the other players don't
+        // so by necessity a different response is required
+        // Need to check if this is the same with many other places where I've used "SendToWaitingPlayers"
         SendToWaitingPlayers(PacketWriter.WriteDisplayPeekPacket(pPacket.CardId));
     }
 

@@ -114,6 +114,18 @@ internal class MockClientGameManager: IClientGameManager
                 case OpCode.DiscardResult:
                     DiscardResultEvent?.Invoke(this, newPacket as ProcessedDiscardResultPacket);
                     break;
+                case OpCode.QuickPlaceResult:
+                    QuickPlaceResultEvent?.Invoke(this, newPacket as ProcessedQuickPlaceResultPacket);
+                    break;
+                case OpCode.PeekResult:
+                    PeekResultEvent?.Invoke(this, newPacket as ProcessedPeekResultPacket);
+                    break;
+                case OpCode.DisplayScramble:
+                    DisplayScrambleEvent?.Invoke(this, newPacket as ProcessedDisplayScramblePacket);
+                    break;
+                case OpCode.GameEnd:
+                    GameEndEvent?.Invoke(this, newPacket as ProcessedGameEndPacket);
+                    break;
                 default:
                     throw new NotImplementedException("Mock received unexpected packet");
 
@@ -173,6 +185,7 @@ internal class MockClientGameManager: IClientGameManager
             _ = HandManager.PunishPlayer(PlayerId);
         }
 
+        // OnQuickPlaceResult:
         // With this, Client should see card with CardValue given fly from hand onto discard pile
         // and then the result can be used to show any punishment (gaining a card) that occurs
         PacketReader.ReadInternalPacket(new ProcessedQuickPlaceResultPacket(SERVER_ID, QPResultAsEnum, PlayerId, cardValue));
@@ -193,6 +206,7 @@ internal class MockClientGameManager: IClientGameManager
 
     public void SendScramblePacket(byte playerId)
     {
+        // OnScramble: Scramble in GUI
         _serverHM.Scramble(playerId);
         PacketReader.ReadInternalPacket(new ProcessedDisplayScramblePacket(SERVER_ID, playerId)); // Also necessary until server change
     }

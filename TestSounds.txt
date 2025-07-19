@@ -1,2 +1,24 @@
 It is possible to configure Visual Studio to play a failure and success sound when tests have been run.
 Attached are two suggested sounds, I implore you to set this feature up (it will improve your life greatly)
+
+TODO:
+OnDrawResult: 
+--> At some point (likely as soon as the next action is decided) we need to reset cards to looking like card backs
+
+OnDiscardResult: Some method outside cgm that will send a Card Action Trigger
+--> At some point (likely when Held Card changes) we need to reset held cards (and all but the discard cards) to looking like a Card Back
+
+OnDisplaySwap: Need to correct server implementation to send this to all clients or/else send an internal packet to do this step
+			   Need to do the animation for this one, or some placeholder for now.
+
+OnQuickPlaceResult: Need to show success/fail (maybe some Green/Red Outline briefly, some wiggle, some audio cue)
+					Need to show punishment if applicable
+					Need to show the actual card that was attempted to be Quick Placed (assign Card Value to the anim card moving from the hand)
+					Need to show "TOO LATE" text (for the server has different Discard pile to Client)
+
+OnPeekResult: Need to assign a Card Value for a limited time to the selected card. Maybe easiest if placing an anim card on top, and hide the one underneath
+
+OnDisplayScramble: Scramble in GUI
+
+OnGameEnd: Some screen to show results. At the moment, anything will do atm though
+
