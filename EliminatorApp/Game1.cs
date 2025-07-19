@@ -103,30 +103,13 @@ public class Game1: Game
 
         _inputValidator = new InputValidator(_serverComm.HandManager);
 
-        _serverComm.StartTurnEvent += (object? sender, ProcessedStartTurnPacket? packet) =>
-        {
-            if (packet != null)
-            {
-                _debugString = "ProcessedStartTurnPacket received, fired trigger on state machine";
-                _gameStateMachine.FireStartTurnTrigger(packet.PlayerId);
-            }
-            else
-            {
-                Debug.WriteLine("Bad ProcessedStartTurnPacket received");
-            }
-        };
-
-        _serverComm.DiscardResultEvent += (object? sender, ProcessedDiscardResultPacket? packet) =>
-        {
-            if (packet == null)
-            {
-                Debug.WriteLine("Bad ProcessedDiscardResultPacket received");
-                return;
-            }
-
-            _debugString = "ProcessedDiscardResultPacket received, fired trigger on state machine";
-            _gameStateMachine.FireDoCardActionTrigger(packet!.CardValue.GetCardAction());
-        };
+        _serverComm.StartTurnEvent += OnStartTurn;
+        _serverComm.DiscardResultEvent += OnDiscardResult;
+        _serverComm.DisplaySwapEvent += OnDisplaySwap;
+        _serverComm.QuickPlaceResultEvent += OnQuickPlaceResult;
+        _serverComm.PeekResultEvent += OnPeekResult;
+        _serverComm.DisplayScrambleEvent += OnDisplayScramble;
+        _serverComm.GameEndEvent += OnGameEnd;
 
         _gameStateMachine.StateChanged += UpdateValidInputs;
         UpdateValidInputs(_gameStateMachine, _gameStateMachine.CurrentState);
@@ -135,6 +118,40 @@ public class Game1: Game
 
         base.Initialize();
     }
+
+    #region IClientGameManager Event Responses
+    private void OnStartTurn(object? sender, ProcessedStartTurnPacket? packet)
+    {
+        if (packet != null)
+        {
+            _debugString = "ProcessedStartTurnPacket received, fired trigger on state machine";
+            _gameStateMachine.FireStartTurnTrigger(packet.PlayerId);
+        }
+        else
+        {
+            Debug.WriteLine("Bad ProcessedStartTurnPacket received");
+        }
+    }
+
+    private void OnDiscardResult(object? sender, ProcessedDiscardResultPacket? packet)
+    {
+        if (packet == null)
+        {
+            Debug.WriteLine("Bad ProcessedDiscardResultPacket received");
+            return;
+        }
+
+        _debugString = "ProcessedDiscardResultPacket received, fired trigger on state machine";
+        _gameStateMachine.FireDoCardActionTrigger(packet!.CardValue.GetCardAction());
+        // TODO: This is missing some animation of moving the card. Or is this to be handled on discard, rather than awaiting a result?
+    }
+
+    private void OnGameEnd(object? sender, ProcessedGameEndPacket? e) => throw new NotImplementedException();
+    private void OnDisplayScramble(object? sender, ProcessedDisplayScramblePacket? e) => throw new NotImplementedException();
+    private void OnPeekResult(object? sender, ProcessedPeekResultPacket? e) => throw new NotImplementedException();
+    private void OnQuickPlaceResult(object? sender, ProcessedQuickPlaceResultPacket? e) => throw new NotImplementedException();
+    private void OnDisplaySwap(object? sender, ProcessedDisplaySwapPacket? e) => throw new NotImplementedException();
+    #endregion
 
     protected override void LoadContent()
     {
