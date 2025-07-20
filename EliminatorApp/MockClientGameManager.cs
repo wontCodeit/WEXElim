@@ -59,6 +59,7 @@ internal class MockClientGameManager: IClientGameManager
     private void OnDiscardResult(object? sender, ProcessedDiscardResultPacket? discardResultPacket)
     {
         _clientCardCounter.ChangePlaceholderNumber(HandManager.TopDiscardCardId, discardResultPacket.CardValue);
+        _clientCardCounter.ChangePlaceholderNumber(HandManager.HeldCardId, null);
     }
 
     private void OnDrawResult(object? sender, ProcessedDrawResultPacket? drPacket)
@@ -90,6 +91,8 @@ internal class MockClientGameManager: IClientGameManager
     // Simulates delay from server, but assumes always success(?)/simplest case
     private void Run()
     {
+        // Encountered a problem: The first time we draw from the deck and attempt some discard, 
+
         while (true)
         {
             if (!PacketReader.NextPacketReady())
@@ -122,6 +125,9 @@ internal class MockClientGameManager: IClientGameManager
                     break;
                 case OpCode.DisplayScramble:
                     DisplayScrambleEvent?.Invoke(this, newPacket as ProcessedDisplayScramblePacket);
+                    break;
+                case OpCode.DisplaySwap:
+                    DisplaySwapEvent?.Invoke(this, newPacket as ProcessedDisplaySwapPacket);
                     break;
                 case OpCode.GameEnd:
                     GameEndEvent?.Invoke(this, newPacket as ProcessedGameEndPacket);

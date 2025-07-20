@@ -224,6 +224,11 @@ public class HandManager
         foreach (List<ICard> hand in _playerHands.Values)
         {
             card = hand.FirstOrDefault(card => card.Id == cardId);
+
+            if (card != null)
+            {
+                break;
+            }
         }
 
         if (card == null)

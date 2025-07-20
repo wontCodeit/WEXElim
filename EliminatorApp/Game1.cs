@@ -152,8 +152,18 @@ public class Game1: Game
     private void OnGameEnd(object? sender, ProcessedGameEndPacket? e) => throw new NotImplementedException();
     private void OnDisplayScramble(object? sender, ProcessedDisplayScramblePacket? e) => throw new NotImplementedException();
     private void OnPeekResult(object? sender, ProcessedPeekResultPacket? e) => throw new NotImplementedException();
-    private void OnQuickPlaceResult(object? sender, ProcessedQuickPlaceResultPacket? e) => throw new NotImplementedException();
-    private void OnDisplaySwap(object? sender, ProcessedDisplaySwapPacket? e) => throw new NotImplementedException();
+    private void OnQuickPlaceResult(object? sender, ProcessedQuickPlaceResultPacket? quickPlaceResultPacket)
+    {
+        // URGENT: repair this foolishness
+        // Only now realising that this packet doesn't contain the card id that would be removed if it is successful
+        // We would receive a QuickPlacePacket earlier on, from which we can grab the card id
+        // This is so stupid because we could just send all the information in one go...
+    }
+
+    private void OnDisplaySwap(object? sender, ProcessedDisplaySwapPacket? displaySwapPacket)
+    {
+        DebugTextVisualiser.AddDrawMeText("OnDisplaySwap fired!");
+    }
     #endregion
 
     protected override void LoadContent()
@@ -332,18 +342,18 @@ public class Game1: Game
         // TODO: I think the below logic needs moving or changing. THis function is broken
         // because it allows Swap even when Card not clickable i.e. clickHappened False
 
-        //if (_serverComm.HandManager.TopDiscardCardId == InputRegistry.First().ButtonId.Value)
-        //{
-        //    _serverComm.SendDiscardPacket();
-        //    //TODO: Add event for managing a discard anim occurring
-        //    CardValue? heldValue = Card.GetNumber(_serverComm.HandManager.HeldCardId);
-        //    Card.ChangePlaceholderNumber(_serverComm.HandManager.TopDiscardCardId, heldValue);
-        //    Card.ChangePlaceholderNumber(_serverComm.HandManager.HeldCardId, null);
-        //    DiscardCardEvent?.Invoke(this, heldValue);
-        //    return;
-        //}
+        // While in DeckDraw, if we clicked on the discard pile
+        if (_serverComm.HandManager.TopDiscardCardId == InputRegistry.First().ButtonId.Value)
+        {
+            _serverComm.SendDiscardPacket();
+            //TODO: Add event for managing a discard anim occurring
+            return;
+        }
 
-        //_serverComm.SendSwapPacket((ushort)InputRegistry.First().ButtonId.Value, _serverComm.HandManager.TopDiscardCardId);
+        // The case that we didn't click the discard pile, this means a swap between held card and the card in hand
+        _serverComm.SendSwapPacket((ushort)InputRegistry.First().ButtonId.Value, _serverComm.HandManager.HeldCardId);
+        // Now we have the held card is the card that was previously in hand. We are forced to discard this
+        _serverComm.SendDiscardPacket();
     }
 
     // performance suffers when creating 50+ NEW textures per frame
@@ -399,6 +409,13 @@ public class Game1: Game
     // TODO: the skip, pass and call buttons
     private void UpdateValidInputs(object? sender, GameState state)
     {
+        // When we move states, we want to unselect all the cards
+        // Except in the case that the state requires a card selection (so the user doesn't have to re-enter it)
+        if (_gameStateMachine.CurrentState != GameState.QuickPlace)
+        {
+            InputRegistry.Clear();
+        }
+
         // Exclude already selected cards, all cancellation done through right click/separate action
         IEnumerable<int> validIds =
             _inputValidator
@@ -424,17 +441,19 @@ public class Game1: Game
         nonCardButtons = nonCardButtons.Concat(_handViews);
         nonCardButtons.ToList().ForEach(button => button.Clickable = false);
 
-        switch (_gameStateMachine.CurrentState)
+        if (_gameStateMachine.CurrentState == GameState.Scramble)
         {
-            case GameState.Scramble:
-                _handViews.ForEach(hand => hand.Clickable = true);
-                break;
-            case GameState.QuickPlace:
-                _deckView.Clickable = true;
-                break;
-            default:
-                break;
+            _handViews.ForEach(hand => hand.Clickable = true);
         }
+
+        //var userMayQP = _inputValidator.CheckCanQuickPlace(_gameStateMachine.CurrentState) && !_inputValidator.UserIsLocked(_serverComm.PlayerId, _serverComm.TurnPlayerId);
+        if (_inputValidator.CheckCanDraw(_gameStateMachine.CurrentState)
+            || _gameStateMachine.CurrentState == GameState.QuickPlace)
+        {
+            _deckView.Clickable = true;
+        }
+
+        // TODO: pass it and call it buttons
     }
 
     private void OnDeckClicked(object? sender, EventArgs e)

@@ -92,6 +92,17 @@ public class InputValidator
         _callItPlayerId = callingPlayerId;
     }
 
+    /// <summary>
+    /// Check if quick placing is allowed. Does not account for being locked!
+    /// </summary>
+    /// <param name="currentState"></param>
+    /// <returns></returns>
+    public bool CheckCanQuickPlace(GameState currentState)
+    {
+        return _handManager.RemainingCards > 0
+            && (currentState == GameState.TurnStart || currentState == GameState.TurnEnd || currentState == GameState.Waiting);
+    }
+
     public bool CheckCanDraw(GameState currentState) => (currentState == GameState.TurnStart) && (_handManager.RemainingCards > 0);
     public bool CheckCanPass(GameState currentState)
     {

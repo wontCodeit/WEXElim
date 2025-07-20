@@ -197,7 +197,10 @@ public class GameStateMachine
 
     private GameState QuickPlaceFinished()
     {
-        var state = (GameState)_quickPlaceEntryPoint!;
+        GameState state = _quickPlaceEntryPoint is null
+            ? GameState.TurnEnd
+            : (GameState)_quickPlaceEntryPoint!;
+
         _quickPlaceEntryPoint = null;
         return state;
     }
