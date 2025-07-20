@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace EliminatorApp;
 
@@ -31,9 +32,10 @@ public class Game1: Game
     private readonly int _removals = 0;
     private int _frameCount = 0;
     private SpriteFont _arial;
-    private string _debugString = "None assigned";
+
     private readonly TimeSpan _prevSwitchTime = TimeSpan.Zero;
     private Color _intersectColor;
+    private RenderTarget2D _debugTextView;
     #endregion
 
     private bool _inputLockRight = false;
@@ -100,6 +102,7 @@ public class Game1: Game
         _gameStateMachine = new(_serverComm.HandManager, _serverComm.PlayerId);
         _handViews = [.. MakeHandViews()];
         _arial = Content.Load<SpriteFont>("MyTextFont");
+        _debugTextView = new(_graphics.GraphicsDevice, 300, 300);
 
         _inputValidator = new InputValidator(_serverComm.HandManager);
 
@@ -124,7 +127,7 @@ public class Game1: Game
     {
         if (packet != null)
         {
-            _debugString = "ProcessedStartTurnPacket received, fired trigger on state machine";
+            DebugTextVisualiser.AddDrawMeText(new("ProcessedStartTurnPacket received, fired trigger on state machine"));
             _gameStateMachine.FireStartTurnTrigger(packet.PlayerId);
         }
         else
@@ -141,7 +144,7 @@ public class Game1: Game
             return;
         }
 
-        _debugString = "ProcessedDiscardResultPacket received, fired trigger on state machine";
+        DebugTextVisualiser.AddDrawMeText(new("ProcessedDiscardResultPacket received, fired trigger on state machine"));
         _gameStateMachine.FireDoCardActionTrigger(packet!.CardValue.GetCardAction());
         // TODO: This is missing some animation of moving the card. Or is this to be handled on discard, rather than awaiting a result?
     }
@@ -258,16 +261,30 @@ public class Game1: Game
                 var cardIntersections = hand.GetCardIntersections(transformedPoint, false).ToList();
                 if (cardIntersections.Count > 0) // TODO: This should always be 1 or 0. Log warning if above 1?
                 {
+                    var clicked = false;
                     foreach (FixedCard? button in cardIntersections.Where(card => card.Clickable))
                     {
                         button.Click();
+                        clicked = true;
                     }
 
-                    HandleCardClicked(true);
+                    if (clicked)
+                    {
+                        HandleCardClicked();
+                        _inputLockLeft = true;
+                    }
+
+                    return;
                 }
 
-                _inputLockLeft = true;
-                HandleCardClicked(false); // Can't remember why I called this when false...
+                // if no (valid) card was clicked, we might assume that they were clicking a Hand
+                if (hand.Clickable)
+                {
+                    HandleHandClicked(hand);
+                    _inputLockLeft = true;
+                    return;
+                }
+
                 return;
             }
         });
@@ -278,17 +295,28 @@ public class Game1: Game
             .Click();
     }
 
+    private void HandleHandClicked(HandView hand)
+    {
+        if (_gameStateMachine.CurrentState != GameState.Scramble)
+        {
+            return;
+        }
+
+        InputRegistry.Add(hand);
+        _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
+    }
+
     /// <summary>
     /// Informs <see cref="GameStateMachine"/> of selection changes, and/or makes requests to send packets
     /// via the <see cref="IClientGameManager"/>. NOTE: Not all objects that look like a card on screen are <see cref="Card"/>s
     /// This function does not handle all <see cref="IButton"/> presses, only explicit <see cref="FixedCard"/> presses
     /// </summary>
     /// <param name="clickHappened"></param>
-    private void HandleCardClicked(bool clickHappened)
+    private void HandleCardClicked()
     {
         if (_gameStateMachine.CurrentState is not GameState.DeckDraw)
         {
-            if (clickHappened && InputRegistry.Count > 0)
+            if (InputRegistry.Count > 0)
             {
                 _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
                 return;
@@ -361,11 +389,7 @@ public class Game1: Game
             new(_graphics.PreferredBackBufferWidth - _arial.MeasureString(output).X - 10, _arial.MeasureString(output).Y * 2),
             Color.Green);
 
-        _spriteBatch.DrawString(
-            _arial,
-            _debugString,
-            new(_graphics.PreferredBackBufferWidth - _arial.MeasureString(_debugString).X - 10, _arial.MeasureString(_debugString).Y * 4),
-            Color.Black);
+        DebugTextVisualiser.DrawAllText(_spriteBatch, _arial, _debugTextView);
 
         _spriteBatch.End();
 
@@ -382,11 +406,13 @@ public class Game1: Game
             .Select(id => (int)id)
             .Except(InputRegistry.Select(button => button.ButtonId.Value));
 
-        _debugString = "Ids: ";
+        var sb = new StringBuilder("Ids: ");
         foreach (var item in validIds)
         {
-            _debugString += item.ToString();
+            sb.Append(item.ToString());
         }
+
+        DebugTextVisualiser.AddDrawMeText(new(sb.ToString()));
 
         var allHandsCards = _handViews.SelectMany(hand => hand.DisplayCards).ToList();
         allHandsCards.ForEach(card =>
@@ -420,7 +446,9 @@ public class Game1: Game
             return;
         }
 
-        if (_gameStateMachine.CurrentState == GameState.QuickPlace)
+        // TODO: Alter so this check isn't needed OR ensure this check is made everywhere it is needed
+        // Check to ensure user has a card selected in order to Quick Place. THey may have entered Quick Place then unselected everything...
+        if (_gameStateMachine.CurrentState == GameState.QuickPlace && InputRegistry.Count > 0)
         {
             // We are not triggering deck click here, because when in QP only the next CardAction (or cancel) is relevant to the state machine
             _serverComm.SendQuickPlacePacket((ushort)InputRegistry.First().ButtonId.Value);

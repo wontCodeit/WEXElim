@@ -2,27 +2,10 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+
 using System.Linq;
 
 namespace EliminatorApp;
-
-public struct DrawMeText
-{
-    public string Text { get; }
-    public Color Colour { get; }
-    public int RemainingLifeTime { get; private set; }
-
-    // 
-    /// <summary>
-    /// Reduce the lifetime on this object. Destroy this when it's life time hits zero (i.e. remove from "TextToDraw")
-    /// </summary>
-    /// <returns> True if this object should be destroyed </returns>
-    public bool DecrementLifeTime()
-    {
-        RemainingLifeTime--;
-        return RemainingLifeTime <= 0;
-    }
-}
 
 /// <summary>
 /// Class for displaying non-obvious changes of game state to the user, useful in debugging. Hopefully can be used in something in release
@@ -31,7 +14,25 @@ public static class DebugTextVisualiser
 {
     private static List<DrawMeText> _textToDraw = [];
 
-    public static void AddDrawMeText(DrawMeText drawMeText) => _textToDraw.Add(drawMeText);
+    /// <summary>
+    /// Create a new text instance to draw. Uses default colour and duration
+    /// </summary>
+    /// <param name="drawMeText"> The text to draw </param>
+    public static void AddDrawMeText(string drawMeText)
+    {
+        _textToDraw.Add(new(drawMeText));
+    }
+
+    /// <summary>
+    /// Create a new text instance to draw.
+    /// </summary>
+    /// <param name="drawMeText"> The text to draw </param>
+    /// <param name="colour"> Colour that the text will be drawn as </param>
+    /// <param name="lifetime"> Lifetime in frames of the text on screen </param>
+    public static void AddDrawMeText(string drawMeText, Color colour, int lifetime)
+    {
+        _textToDraw.Add(new(drawMeText, colour, lifetime));
+    }
 
     /// <summary>
     /// Draw all the stored <see cref="DrawMeText"/> objects and handle their lifetimes
@@ -80,7 +81,7 @@ public static class DebugTextVisualiser
         };
 
         // Adjust scaling until all objects will fit
-        while (!checkIfTextFits())
+        while (checkIfTextFits())
         {
             scaling *= 0.9;
         }
@@ -91,10 +92,10 @@ public static class DebugTextVisualiser
         var textObjsPlacedInRow = 0;
         for (var i = 0; i < _textToDraw.Count; i++)
         {
-            var text = _textToDraw[i].Text;
+            _textToDraw[i].RemainingLifetime--;
             spriteBatch.DrawString(
                 font,
-                text,
+                _textToDraw[i].Text,
                 currentPosition,
                 _textToDraw[i].Colour,
                 0f,
@@ -112,10 +113,38 @@ public static class DebugTextVisualiser
                 continue;
             }
 
-            currentPosition = new Vector2(0, currentPosition.Y + font.MeasureString(text).Y);
+            currentPosition = new Vector2(0, currentPosition.Y + font.MeasureString(_textToDraw[i].Text).Y);
             textObjsPlacedInRow = 0;
         }
 
-        _textToDraw = [.. _textToDraw.Where(drawMe => !drawMe.DecrementLifeTime())];
+        _textToDraw = [.. _textToDraw.Where(drawMe => drawMe.RemainingLifetime > 0)];
+    }
+
+    private class DrawMeText
+    {
+        public string Text { get; } = "Not set";
+        public Color Colour { get; } = Color.White;
+        public int RemainingLifetime { get; set; } = 360;
+
+        /// <summary>
+        /// Construct an instance
+        /// </summary>
+        /// <param name="text"> The text that shall be drawn </param>
+        /// <param name="colour"> Colour of the text that will be drawn </param>
+        public DrawMeText(string text, Color colour, int lifetime)
+        {
+            Text = text;
+            Colour = colour;
+            RemainingLifetime = lifetime;
+        }
+
+        /// <summary>
+        /// Create instance with a white colour (default)
+        /// </summary>
+        /// <param name="text"></param>
+        public DrawMeText(string text)
+        {
+            Text = text;
+        }
     }
 }
