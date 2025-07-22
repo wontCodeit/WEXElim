@@ -154,10 +154,48 @@ public class Game1: Game
     private void OnPeekResult(object? sender, ProcessedPeekResultPacket? e) => throw new NotImplementedException();
     private void OnQuickPlaceResult(object? sender, ProcessedQuickPlaceResultPacket? quickPlaceResultPacket)
     {
-        // URGENT: repair this foolishness
-        // Only now realising that this packet doesn't contain the card id that would be removed if it is successful
-        // We would receive a QuickPlacePacket earlier on, from which we can grab the card id
-        // This is so stupid because we could just send all the information in one go...
+        // TODO: Account for "punish" or "success" by adding a new card or removing a card respectively
+        // Need to show the actual card that was attempted to be Quick Placed (assign Card Value to the anim card moving from the hand)
+        // Need to show "TOO LATE" text(for the server has different Discard pile to Client)
+
+        if (quickPlaceResultPacket == null)
+        {
+            DebugTextVisualiser.AddDrawMeText("ProcessedQuickPlaceResultPacket was null! OnQuickPlaceResult failed");
+            return;
+        }
+
+        if (quickPlaceResultPacket!.Result == QuickPlaceResult.TooLate)
+        {
+            DebugTextVisualiser.AddDrawMeText("OnQuickPlaceResult: TOO LATE!", Color.Orange, 360);
+            return;
+        }
+
+        HandView qpPlayer = _handViews.First(hand => hand.HandID == quickPlaceResultPacket!.PlayerId);
+        var cardsInView = qpPlayer.DisplayCards.Select(dcard => dcard.RepresentedCard).ToList();
+        List<ICard> cardsInHand = _serverComm.HandManager.GetCardsInHand(quickPlaceResultPacket!.PlayerId);
+        if (quickPlaceResultPacket!.Result == QuickPlaceResult.Success)
+        {
+            DebugTextVisualiser.AddDrawMeText("OnQuickPlaceResult:: SUCCESS!", Color.Green, 360);
+            IEnumerable<ICard> cardRemoved = cardsInView.ExceptBy(cardsInView, c => c, new CardComparer());
+
+            foreach (ICard card in cardRemoved)
+            {
+                _ = qpPlayer.RemoveFixedCard(card);
+            }
+            // URGENT: This is when we need our Discard to occur, or if not here then in our IClientGameManager
+            return;
+        }
+
+        DebugTextVisualiser.AddDrawMeText("OnQuickPlaceResult:: PUNISHMENT!", Color.Red, 360);
+
+        IEnumerable<ICard> cardToAdd = cardsInHand.ExceptBy(cardsInView, c => c, new CardComparer());
+        foreach (ICard card in cardToAdd)
+        {
+            _ = qpPlayer.AddFixedCard(card);
+        }
+
+        // Exit the quick place state. This is important when going from 1 card in deck to 0, as we need to revalidate
+        _gameStateMachine.FireDoCardActionTrigger(CardAction.None);
     }
 
     private void OnDisplaySwap(object? sender, ProcessedDisplaySwapPacket? displaySwapPacket)
@@ -255,6 +293,7 @@ public class Game1: Game
     /// <param name="cursor"> The cursor state at the time of clicking </param>
     private void AttemptClick(MouseState cursor)
     {
+        _inputLockLeft = true;
         Vector2 transformedPoint = new(cursor.X / _screenScale, cursor.Y / _screenScale);
         _handViews.ForEach(hand =>
         {
@@ -281,7 +320,6 @@ public class Game1: Game
                     if (clicked)
                     {
                         HandleCardClicked();
-                        _inputLockLeft = true;
                     }
 
                     return;
@@ -291,7 +329,6 @@ public class Game1: Game
                 if (hand.Clickable)
                 {
                     HandleHandClicked(hand);
-                    _inputLockLeft = true;
                     return;
                 }
 

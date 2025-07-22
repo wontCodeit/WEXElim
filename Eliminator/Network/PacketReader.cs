@@ -208,8 +208,9 @@ public class PacketReader: BinaryReader
         var result = (QuickPlaceResult)ReadByte();
         var playerId = ReadByte();
         var cardValue = (CardValue)ReadByte();
+        var cardId = ReadUInt16();
         _waitingPackets.Enqueue(new
-            ProcessedQuickPlaceResultPacket(_senderId, result, playerId, cardValue));
+            ProcessedQuickPlaceResultPacket(_senderId, result, playerId, cardValue, cardId));
     }
 
     private void ReadStartTurn()

@@ -374,7 +374,8 @@ public class HostGameManager
             _server.BroadcastAll(PacketWriter.WriteQuickPlaceResultPacket
                 (QuickPlaceResult.Success,
                 qpPacket.SenderId,
-                placedVal));
+                placedVal,
+                qpPacket.CardId));
             _expectedCardActions = [placedVal.GetCardAction()];
             return;
         }
@@ -384,7 +385,8 @@ public class HostGameManager
             _server.BroadcastAll(PacketWriter.WriteQuickPlaceResultPacket
                 (QuickPlaceResult.TooLate,
                 qpPacket.SenderId,
-                placedVal));
+                placedVal,
+                qpPacket.CardId));
             return;
         }
 
@@ -392,7 +394,8 @@ public class HostGameManager
         _server.BroadcastAll(PacketWriter.WriteQuickPlaceResultPacket
             (QuickPlaceResult.Failure,
             qpPacket.SenderId,
-            placedVal));
+            placedVal,
+            qpPacket.CardId));
         return;
     }
 

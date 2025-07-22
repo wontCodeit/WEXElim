@@ -194,7 +194,7 @@ internal class MockClientGameManager: IClientGameManager
         // OnQuickPlaceResult:
         // With this, Client should see card with CardValue given fly from hand onto discard pile
         // and then the result can be used to show any punishment (gaining a card) that occurs
-        PacketReader.ReadInternalPacket(new ProcessedQuickPlaceResultPacket(SERVER_ID, QPResultAsEnum, PlayerId, cardValue));
+        PacketReader.ReadInternalPacket(new ProcessedQuickPlaceResultPacket(SERVER_ID, QPResultAsEnum, PlayerId, cardValue, cardId));
 
         if (QPResultAsEnum == QuickPlaceResult.Success)
         {

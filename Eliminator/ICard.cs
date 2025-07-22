@@ -1,4 +1,6 @@
-﻿namespace Eliminator;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Eliminator;
 
 /// <summary>
 /// Contains an Id which is tied to a value. Values may change, ids (or cards) should not move if they don't have to
@@ -16,4 +18,19 @@ public interface ICard
     public CardValue? Number { get; }
 
     public void ChangeNumber(CardValue value);
+}
+
+public class CardComparer: IEqualityComparer<ICard>
+{
+    public bool Equals(ICard? x, ICard? y)
+    {
+        return x == null || y == null
+            ? false
+            : x.Id == y.Id;
+    }
+
+    public int GetHashCode([DisallowNull] ICard obj)
+    {
+        return obj.Id.GetHashCode();
+    }
 }
