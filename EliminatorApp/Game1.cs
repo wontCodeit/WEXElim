@@ -284,6 +284,8 @@ public class Game1: Game
             _inputLockLeft = false;
         }
 
+        DebugTextVisualiser.RemoveTextOutOfLife();
+
         base.Update(gameTime);
     }
 
@@ -450,7 +452,15 @@ public class Game1: Game
         // Except in the case that the state requires a card selection (so the user doesn't have to re-enter it)
         if (_gameStateMachine.CurrentState != GameState.QuickPlace)
         {
-            InputRegistry.Clear();
+            if (InputRegistry.Count > 0)
+            {
+                IButton[] buttons = [.. InputRegistry];
+                // Buttons in the input registry are put there with a click and removed with a click
+                foreach (IButton button in buttons)
+                {
+                    button.Click();
+                }
+            }
         }
 
         // Exclude already selected cards, all cancellation done through right click/separate action
@@ -483,11 +493,10 @@ public class Game1: Game
             _handViews.ForEach(hand => hand.Clickable = true);
         }
 
-        //var userMayQP = _inputValidator.CheckCanQuickPlace(_gameStateMachine.CurrentState) && !_inputValidator.UserIsLocked(_serverComm.PlayerId, _serverComm.TurnPlayerId);
-        if (_inputValidator.CheckCanDraw(_gameStateMachine.CurrentState)
-            || _gameStateMachine.CurrentState == GameState.QuickPlace)
+        // _deckView is not initialise until left the state of initialisation
+        if (_gameStateMachine.CurrentState != GameState.Initialisation)
         {
-            _deckView.Clickable = true;
+            _deckView.Clickable = _inputValidator.CheckCanQuickPlace(_gameStateMachine.CurrentState, _serverComm.PlayerId, _serverComm.TurnPlayerId);
         }
 
         // TODO: pass it and call it buttons

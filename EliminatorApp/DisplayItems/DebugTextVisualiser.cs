@@ -116,7 +116,13 @@ public static class DebugTextVisualiser
             currentPosition = new Vector2(0, currentPosition.Y + font.MeasureString(_textToDraw[i].Text).Y);
             textObjsPlacedInRow = 0;
         }
+    }
 
+    /// <summary>
+    /// Made separate function because previously it was modifying during drawing (somehow- I blame GUI threads I suppose)
+    /// </summary>
+    public static void RemoveTextOutOfLife()
+    {
         _textToDraw = [.. _textToDraw.Where(drawMe => drawMe.RemainingLifetime > 0)];
     }
 
