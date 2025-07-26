@@ -149,9 +149,49 @@ public class Game1: Game
         // TODO: This is missing some animation of moving the card. Or is this to be handled on discard, rather than awaiting a result?
     }
 
-    private void OnGameEnd(object? sender, ProcessedGameEndPacket? e) => throw new NotImplementedException();
-    private void OnDisplayScramble(object? sender, ProcessedDisplayScramblePacket? e) => throw new NotImplementedException();
-    private void OnPeekResult(object? sender, ProcessedPeekResultPacket? e) => throw new NotImplementedException();
+    private void OnGameEnd(object? sender, ProcessedGameEndPacket? e)
+    {
+        // TODO: Expand on this, this code is a temporary placeholder
+        if (e == null)
+        {
+            DebugTextVisualiser.AddDrawMeText("ProcessedGameEndPacket was null! OnGameEnd failed");
+            return;
+        }
+
+        var sb = new StringBuilder();
+        foreach ((byte, int) pair in e!.Scores)
+        {
+            _ = sb.Append($"PlayerID: {pair.Item1}, Score: {pair.Item2}\n");
+        }
+
+        DebugTextVisualiser.AddDrawMeText(sb.ToString(), Color.White, 60_000);
+    }
+    private void OnDisplayScramble(object? sender, ProcessedDisplayScramblePacket? e)
+    {
+        // TODO: Actually do this anim
+        if (e == null)
+        {
+            DebugTextVisualiser.AddDrawMeText("ProcessedDisplayScramblePacket was null! OnDisplayScramble failed");
+            return;
+        }
+
+        DebugTextVisualiser.AddDrawMeText($"Player {e.PlayerId} got Scrambled!");
+    }
+    private void OnPeekResult(object? sender, ProcessedPeekResultPacket? e)
+    {
+        // TODO: Actually do this anim
+        // URGENT: This is another place I've decided to shoot myself in the foot and not send the Card Id too
+        // Perhaps this is part of the reason why everyone is up in arms about minimising state...
+
+        if (e == null)
+        {
+            DebugTextVisualiser.AddDrawMeText("ProcessedPeekResultPacket was null! OnPeekResult failed");
+            return;
+        }
+
+        DebugTextVisualiser.AddDrawMeText($"{e!.CardValue} Found! Id must be saved as state for some reason!");
+    }
+
     private void OnQuickPlaceResult(object? sender, ProcessedQuickPlaceResultPacket? quickPlaceResultPacket)
     {
         // TODO: Account for "punish" or "success" by adding a new card or removing a card respectively
@@ -182,7 +222,7 @@ public class Game1: Game
             {
                 _ = qpPlayer.RemoveFixedCard(card);
             }
-            // URGENT: This is when we need our Discard to occur, or if not here then in our IClientGameManager
+
             return;
         }
 

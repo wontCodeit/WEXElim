@@ -91,7 +91,12 @@ internal class MockClientGameManager: IClientGameManager
     // Simulates delay from server, but assumes always success(?)/simplest case
     private void Run()
     {
-        // Encountered a problem: The first time we draw from the deck and attempt some discard, 
+        // URGENT: Encountered a problem: The first time we draw from the deck and attempt some discard, discard pile has no value
+        // Server must do some draw and discard immediately, Then relay this to clients or have it be part of the Initialise game function (as it is expected)
+        _serverHM.DrawCard();
+        _serverHM.DiscardHeldCard();
+        HandManager.DrawCard();
+        HandManager.DiscardHeldCard();
 
         while (true)
         {
