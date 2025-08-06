@@ -91,8 +91,6 @@ internal class MockClientGameManager: IClientGameManager
     // Simulates delay from server, but assumes always success(?)/simplest case
     private void Run()
     {
-        // URGENT: Encountered a problem: The first time we draw from the deck and attempt some discard, discard pile has no value
-        // Server must do some draw and discard immediately, Then relay this to clients or have it be part of the Initialise game function (as it is expected)
         _serverHM.DrawCard();
         _serverHM.DiscardHeldCard();
         HandManager.DrawCard();
@@ -211,8 +209,8 @@ internal class MockClientGameManager: IClientGameManager
     public void SendPeekPacket(ushort cardId)
     {
         // OnPeekResult: Assign to the given card (for a finite duration!) and maybe send event for some animation to play
-        PacketReader.ReadInternalPacket(new ProcessedPeekResultPacket(SERVER_ID, (CardValue)_serverCardCounter.GetNumber(cardId)));
-        PacketReader.ReadInternalPacket(new ProcessedDisplayPeekPacket(SERVER_ID, cardId)); // THis is necessary for now as server doesn't send this here yet
+        PacketReader.ReadInternalPacket(new ProcessedPeekResultPacket(SERVER_ID, (CardValue)_serverCardCounter.GetNumber(cardId), cardId));
+        PacketReader.ReadInternalPacket(new ProcessedDisplayPeekPacket(SERVER_ID, cardId)); // TODO: I now believe this to be unnecessary
     }
 
     public void SendScramblePacket(byte playerId)

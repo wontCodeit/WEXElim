@@ -144,7 +144,7 @@ public class Game1: Game
             return;
         }
 
-        DebugTextVisualiser.AddDrawMeText(new("ProcessedDiscardResultPacket received, fired trigger on state machine"));
+        DebugTextVisualiser.AddDrawMeText(new($"ProcessedDiscardResultPacket received, fired {packet!.CardValue.GetCardAction()} on state machine"));
         _gameStateMachine.FireDoCardActionTrigger(packet!.CardValue.GetCardAction());
         // TODO: This is missing some animation of moving the card. Or is this to be handled on discard, rather than awaiting a result?
     }
@@ -180,8 +180,6 @@ public class Game1: Game
     private void OnPeekResult(object? sender, ProcessedPeekResultPacket? e)
     {
         // TODO: Actually do this anim
-        // URGENT: This is another place I've decided to shoot myself in the foot and not send the Card Id too
-        // Perhaps this is part of the reason why everyone is up in arms about minimising state...
 
         if (e == null)
         {
@@ -189,7 +187,7 @@ public class Game1: Game
             return;
         }
 
-        DebugTextVisualiser.AddDrawMeText($"{e!.CardValue} Found! Id must be saved as state for some reason!");
+        DebugTextVisualiser.AddDrawMeText($"{e!.CardValue} Found at Id {e!.CardId}!");
     }
 
     private void OnQuickPlaceResult(object? sender, ProcessedQuickPlaceResultPacket? quickPlaceResultPacket)

@@ -93,6 +93,11 @@ public class HostGameManager
         Console.WriteLine("Sent initialise game packet");
 
         Thread.Sleep(1_000); // Wait for client game to start TODO: Remove by being more clever
+
+        // Implicit in game start, the discard pile always holds at least one card value
+        _handManager.DrawCard();
+        _handManager.DiscardHeldCard();
+
         var r = new Random();
         _turnPlayerId = (byte)r.Next(0, _playerIds.Last());
         _server.BroadcastAll(
@@ -240,7 +245,7 @@ public class HostGameManager
         _expectedCardActions = [CardAction.None];
         _server.BroadcastSpecific(
             [_turnPlayerId],
-            PacketWriter.WritePeekResultPacket((CardValue)_counter.GetNumber(pPacket.CardId)!));
+            PacketWriter.WritePeekResultPacket((CardValue)_counter.GetNumber(pPacket.CardId)!, pPacket.CardId));
         // TODO: It makes much more sense to simply send a DisplayPeek packet to all players and respond to it
         // HOWEVER, in this case the player who peeked gets to see a card, and the other players don't
         // so by necessity a different response is required

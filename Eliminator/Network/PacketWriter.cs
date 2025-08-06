@@ -265,11 +265,13 @@ public static class PacketWriter
     /// Tells the client the <see cref="CardValue"/> of the card that has been peeked
     /// </summary>
     /// <param name="cardValue"> the <see cref="CardValue"/> of the peeked card </param>
+    /// <param name="cardId"> id of peeked card </param>
     /// <returns> The packet as a <see cref="byte"/> array </returns>
-    public static byte[] WritePeekResultPacket(CardValue cardValue)
+    public static byte[] WritePeekResultPacket(CardValue cardValue, ushort cardId)
     {
         WriteToPacket(OpCode.PeekResult);
         WriteToPacket(cardValue);
+        WriteToPacket(cardId);
 
         return RetrievePacket();
     }

@@ -143,6 +143,10 @@ public class ClientGameManager: IClientGameManager
         }
 
         HandManager = new((byte)igPacket.Players.Count, igPacket.StartingCards, new BlankDeck(igPacket.DeckSize), _counter);
+
+        // At game start, discard pile always has a card in it
+        HandManager.DrawCard();
+        HandManager.DiscardHeldCard();
     }
 
     private void OnStartTurn(object? sender, ProcessedStartTurnPacket? stPacket)
