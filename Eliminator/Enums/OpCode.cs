@@ -10,7 +10,7 @@ public enum OpCode: byte
     Disconnection, // to contain a player id informing the client that said player has lost connection
 
     QuickPlace, // to contain what id card is placed and what the user sees on the discard pile
-    QuickPlaceResult, // a byte enum for success/fail/too late and id of who did it - if success, client is playing and they did it they should await a discard result
+    QuickPlaceResult, // a byte enum for success/fail/too late, id of who did it, id of the card placed and the card value- if success, turn player should await a discard result
 
     StartTurn, // to contain user id who should start their turn, sent to all so everyone knows who's turn it is
 

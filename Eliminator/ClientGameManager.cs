@@ -6,9 +6,7 @@ using System.Net.Sockets;
 namespace Eliminator;
 
 /// <summary>
-/// Provides functionality for managing the Eliminator game excluding specifics like the GUI
-/// Handles server communication, holds the <see cref="HandManager"/> and provides a host of events
-/// which are the server-event driven part of this event-driven program
+/// <inheritdoc cref="IClientGameManager"/>
 /// </summary>
 /// TODO: Add additional methods for sending packets
 public class ClientGameManager: IClientGameManager
@@ -33,6 +31,13 @@ public class ClientGameManager: IClientGameManager
     public event EventHandler<ProcessedInitialiseGamePacket?>? InitialiseGameEvent;
     public event EventHandler<EventArgs>? FatalErrorEvent; // When there is something wrong that nothing can be done about :C
     public event EventHandler<ProcessedAssignIdPacket?>? AssignIdResponseEvent;
+    public event EventHandler<ProcessedGameEndPacket?>? GameEndEvent;
+    public event EventHandler<ProcessedDisplayScramblePacket?>? DisplayScrambleEvent;
+    public event EventHandler<ProcessedDisplayPeekPacket?>? DisplayPeekEvent;
+    public event EventHandler<ProcessedPeekResultPacket?>? PeekResultEvent;
+    public event EventHandler<ProcessedQuickPlaceResultPacket?>? QuickPlaceResultEvent;
+    public event EventHandler<ProcessedDisplaySwapPacket?>? DisplaySwapEvent;
+    public event EventHandler<ProcessedDiscardResultPacket?>? DiscardResultEvent;
     #endregion
 
     public ClientGameManager(string dnsHostName, int dnsPort)
@@ -56,11 +61,7 @@ public class ClientGameManager: IClientGameManager
         Debug.WriteLine($"Sent connect packet");
     }
 
-    public void SendDrawPacket()
-    {
-        _serverAccess.SendPacket(PacketWriter.WriteDrawPacket());
-        Debug.WriteLine($"Sent draw packet");
-    }
+    public void SendDisconnectPacket() => throw new NotImplementedException();
 
     public void SendDiscardPacket()
     {
@@ -69,7 +70,18 @@ public class ClientGameManager: IClientGameManager
         Debug.WriteLine($"Sent discard packet");
     }
 
+    public void SendDrawPacket()
+    {
+        _serverAccess.SendPacket(PacketWriter.WriteDrawPacket());
+        Debug.WriteLine($"Sent draw packet");
+    }
+
+    public void SendQuickPlacePacket(ushort cardId) => throw new NotImplementedException();
+
     public void SendSwapPacket(ushort cardId1, ushort cardId2) => throw new NotImplementedException();
+    public void SendPeekPacket(ushort cardId) => throw new NotImplementedException();
+    public void SendScramblePacket(byte playerId) => throw new NotImplementedException();
+    public void SendCallItPacket() => throw new NotImplementedException();
 
     public void BeginRun()
     {
@@ -131,6 +143,10 @@ public class ClientGameManager: IClientGameManager
         }
 
         HandManager = new((byte)igPacket.Players.Count, igPacket.StartingCards, new BlankDeck(igPacket.DeckSize), _counter);
+
+        // At game start, discard pile always has a card in it
+        HandManager.DrawCard();
+        HandManager.DiscardHeldCard();
     }
 
     private void OnStartTurn(object? sender, ProcessedStartTurnPacket? stPacket)
@@ -185,6 +201,4 @@ public class ClientGameManager: IClientGameManager
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
-
-    public void SendQuickPlacePacket(ushort cardId) => throw new NotImplementedException();
 }

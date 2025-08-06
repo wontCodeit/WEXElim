@@ -205,11 +205,12 @@ public class PacketReader: BinaryReader
 
     private void ReadQuickPlaceResult()
     {
-        var result = (QuickPlaceSuccess)ReadByte();
+        var result = (QuickPlaceResult)ReadByte();
         var playerId = ReadByte();
         var cardValue = (CardValue)ReadByte();
+        var cardId = ReadUInt16();
         _waitingPackets.Enqueue(new
-            ProcessedQuickPlaceResultPacket(_senderId, result, playerId, cardValue));
+            ProcessedQuickPlaceResultPacket(_senderId, result, playerId, cardValue, cardId));
     }
 
     private void ReadStartTurn()
@@ -277,8 +278,9 @@ public class PacketReader: BinaryReader
     private void ReadPeekResult()
     {
         var cardValue = (CardValue)ReadByte();
+        var cardId = ReadUInt16();
         _waitingPackets.Enqueue(new
-            ProcessedPeekResultPacket(_senderId, cardValue));
+            ProcessedPeekResultPacket(_senderId, cardValue, cardId));
     }
 
     private void ReadDisplayPeek()

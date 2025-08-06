@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace EliminatorApp;
 
@@ -31,9 +32,10 @@ public class Game1: Game
     private readonly int _removals = 0;
     private int _frameCount = 0;
     private SpriteFont _arial;
-    private string _debugString = "None assigned";
+
     private readonly TimeSpan _prevSwitchTime = TimeSpan.Zero;
     private Color _intersectColor;
+    private RenderTarget2D _debugTextView;
     #endregion
 
     private bool _inputLockRight = false;
@@ -100,21 +102,17 @@ public class Game1: Game
         _gameStateMachine = new(_serverComm.HandManager, _serverComm.PlayerId);
         _handViews = [.. MakeHandViews()];
         _arial = Content.Load<SpriteFont>("MyTextFont");
+        _debugTextView = new(_graphics.GraphicsDevice, 300, 300);
 
         _inputValidator = new InputValidator(_serverComm.HandManager);
 
-        _serverComm.StartTurnEvent += (object? sender, ProcessedStartTurnPacket? packet) =>
-        {
-            if (packet != null)
-            {
-                _debugString = "ProcessedStartTurnPacket received, fired trigger on state machine";
-                _gameStateMachine.FireStartTurnTrigger(packet.PlayerId);
-            }
-            else
-            {
-                Debug.WriteLine("Bad ProcessedStartTurnPacket received");
-            }
-        };
+        _serverComm.StartTurnEvent += OnStartTurn;
+        _serverComm.DiscardResultEvent += OnDiscardResult;
+        _serverComm.DisplaySwapEvent += OnDisplaySwap;
+        _serverComm.QuickPlaceResultEvent += OnQuickPlaceResult;
+        _serverComm.PeekResultEvent += OnPeekResult;
+        _serverComm.DisplayScrambleEvent += OnDisplayScramble;
+        _serverComm.GameEndEvent += OnGameEnd;
 
         _gameStateMachine.StateChanged += UpdateValidInputs;
         UpdateValidInputs(_gameStateMachine, _gameStateMachine.CurrentState);
@@ -123,6 +121,126 @@ public class Game1: Game
 
         base.Initialize();
     }
+
+    #region IClientGameManager Event Responses
+    private void OnStartTurn(object? sender, ProcessedStartTurnPacket? packet)
+    {
+        if (packet != null)
+        {
+            DebugTextVisualiser.AddDrawMeText(new("ProcessedStartTurnPacket received, fired trigger on state machine"));
+            _gameStateMachine.FireStartTurnTrigger(packet.PlayerId);
+        }
+        else
+        {
+            Debug.WriteLine("Bad ProcessedStartTurnPacket received");
+        }
+    }
+
+    private void OnDiscardResult(object? sender, ProcessedDiscardResultPacket? packet)
+    {
+        if (packet == null)
+        {
+            Debug.WriteLine("Bad ProcessedDiscardResultPacket received");
+            return;
+        }
+
+        DebugTextVisualiser.AddDrawMeText(new($"ProcessedDiscardResultPacket received, fired {packet!.CardValue.GetCardAction()} on state machine"));
+        _gameStateMachine.FireDoCardActionTrigger(packet!.CardValue.GetCardAction());
+        // TODO: This is missing some animation of moving the card. Or is this to be handled on discard, rather than awaiting a result?
+    }
+
+    private void OnGameEnd(object? sender, ProcessedGameEndPacket? e)
+    {
+        // TODO: Expand on this, this code is a temporary placeholder
+        if (e == null)
+        {
+            DebugTextVisualiser.AddDrawMeText("ProcessedGameEndPacket was null! OnGameEnd failed");
+            return;
+        }
+
+        var sb = new StringBuilder();
+        foreach ((byte, int) pair in e!.Scores)
+        {
+            _ = sb.Append($"PlayerID: {pair.Item1}, Score: {pair.Item2}\n");
+        }
+
+        DebugTextVisualiser.AddDrawMeText(sb.ToString(), Color.White, 60_000);
+    }
+    private void OnDisplayScramble(object? sender, ProcessedDisplayScramblePacket? e)
+    {
+        // TODO: Actually do this anim
+        if (e == null)
+        {
+            DebugTextVisualiser.AddDrawMeText("ProcessedDisplayScramblePacket was null! OnDisplayScramble failed");
+            return;
+        }
+
+        DebugTextVisualiser.AddDrawMeText($"Player {e.PlayerId} got Scrambled!");
+    }
+    private void OnPeekResult(object? sender, ProcessedPeekResultPacket? e)
+    {
+        // TODO: Actually do this anim
+
+        if (e == null)
+        {
+            DebugTextVisualiser.AddDrawMeText("ProcessedPeekResultPacket was null! OnPeekResult failed");
+            return;
+        }
+
+        DebugTextVisualiser.AddDrawMeText($"{e!.CardValue} Found at Id {e!.CardId}!");
+    }
+
+    private void OnQuickPlaceResult(object? sender, ProcessedQuickPlaceResultPacket? quickPlaceResultPacket)
+    {
+        // TODO: Account for "punish" or "success" by adding a new card or removing a card respectively
+        // Need to show the actual card that was attempted to be Quick Placed (assign Card Value to the anim card moving from the hand)
+        // Need to show "TOO LATE" text(for the server has different Discard pile to Client)
+
+        if (quickPlaceResultPacket == null)
+        {
+            DebugTextVisualiser.AddDrawMeText("ProcessedQuickPlaceResultPacket was null! OnQuickPlaceResult failed");
+            return;
+        }
+
+        if (quickPlaceResultPacket!.Result == QuickPlaceResult.TooLate)
+        {
+            DebugTextVisualiser.AddDrawMeText("OnQuickPlaceResult: TOO LATE!", Color.Orange, 360);
+            return;
+        }
+
+        HandView qpPlayer = _handViews.First(hand => hand.HandID == quickPlaceResultPacket!.PlayerId);
+        var cardsInView = qpPlayer.DisplayCards.Select(dcard => dcard.RepresentedCard).ToList();
+        List<ICard> cardsInHand = _serverComm.HandManager.GetCardsInHand(quickPlaceResultPacket!.PlayerId);
+        if (quickPlaceResultPacket!.Result == QuickPlaceResult.Success)
+        {
+            DebugTextVisualiser.AddDrawMeText("OnQuickPlaceResult:: SUCCESS!", Color.Green, 360);
+            IEnumerable<ICard> cardRemoved = cardsInView.ExceptBy(cardsInView, c => c, new CardComparer());
+
+            foreach (ICard card in cardRemoved)
+            {
+                _ = qpPlayer.RemoveFixedCard(card);
+            }
+
+            return;
+        }
+
+        DebugTextVisualiser.AddDrawMeText("OnQuickPlaceResult:: PUNISHMENT!", Color.Red, 360);
+
+        IEnumerable<ICard> cardToAdd = cardsInHand.ExceptBy(cardsInView, c => c, new CardComparer());
+        foreach (ICard card in cardToAdd)
+        {
+            _ = qpPlayer.AddFixedCard(card);
+        }
+
+        // Exit the quick place state. This is important when going from 1 card in deck to 0, as we need to revalidate
+        _gameStateMachine.FireDoCardActionTrigger(CardAction.None);
+    }
+
+    private void OnDisplaySwap(object? sender, ProcessedDisplaySwapPacket? displaySwapPacket)
+    {
+        DebugTextVisualiser.AddDrawMeText("OnDisplaySwap fired!");
+    }
+    #endregion
 
     protected override void LoadContent()
     {
@@ -204,6 +322,8 @@ public class Game1: Game
             _inputLockLeft = false;
         }
 
+        DebugTextVisualiser.RemoveTextOutOfLife();
+
         base.Update(gameTime);
     }
 
@@ -213,6 +333,7 @@ public class Game1: Game
     /// <param name="cursor"> The cursor state at the time of clicking </param>
     private void AttemptClick(MouseState cursor)
     {
+        _inputLockLeft = true;
         Vector2 transformedPoint = new(cursor.X / _screenScale, cursor.Y / _screenScale);
         _handViews.ForEach(hand =>
         {
@@ -229,16 +350,28 @@ public class Game1: Game
                 var cardIntersections = hand.GetCardIntersections(transformedPoint, false).ToList();
                 if (cardIntersections.Count > 0) // TODO: This should always be 1 or 0. Log warning if above 1?
                 {
+                    var clicked = false;
                     foreach (FixedCard? button in cardIntersections.Where(card => card.Clickable))
                     {
                         button.Click();
+                        clicked = true;
                     }
 
-                    HandleCardClicked(true);
+                    if (clicked)
+                    {
+                        HandleCardClicked();
+                    }
+
+                    return;
                 }
 
-                _inputLockLeft = true;
-                HandleCardClicked(false); // Can't remember why I called this when false...
+                // if no (valid) card was clicked, we might assume that they were clicking a Hand
+                if (hand.Clickable)
+                {
+                    HandleHandClicked(hand);
+                    return;
+                }
+
                 return;
             }
         });
@@ -249,17 +382,28 @@ public class Game1: Game
             .Click();
     }
 
+    private void HandleHandClicked(HandView hand)
+    {
+        if (_gameStateMachine.CurrentState != GameState.Scramble)
+        {
+            return;
+        }
+
+        InputRegistry.Add(hand);
+        _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
+    }
+
     /// <summary>
     /// Informs <see cref="GameStateMachine"/> of selection changes, and/or makes requests to send packets
     /// via the <see cref="IClientGameManager"/>. NOTE: Not all objects that look like a card on screen are <see cref="Card"/>s
     /// This function does not handle all <see cref="IButton"/> presses, only explicit <see cref="FixedCard"/> presses
     /// </summary>
     /// <param name="clickHappened"></param>
-    private void HandleCardClicked(bool clickHappened)
+    private void HandleCardClicked()
     {
         if (_gameStateMachine.CurrentState is not GameState.DeckDraw)
         {
-            if (clickHappened && InputRegistry.Count > 0)
+            if (InputRegistry.Count > 0)
             {
                 _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
                 return;
@@ -275,18 +419,18 @@ public class Game1: Game
         // TODO: I think the below logic needs moving or changing. THis function is broken
         // because it allows Swap even when Card not clickable i.e. clickHappened False
 
-        //if (_serverComm.HandManager.TopDiscardCardId == InputRegistry.First().ButtonId.Value)
-        //{
-        //    _serverComm.SendDiscardPacket();
-        //    //TODO: Add event for managing a discard anim occurring
-        //    CardValue? heldValue = Card.GetNumber(_serverComm.HandManager.HeldCardId);
-        //    Card.ChangePlaceholderNumber(_serverComm.HandManager.TopDiscardCardId, heldValue);
-        //    Card.ChangePlaceholderNumber(_serverComm.HandManager.HeldCardId, null);
-        //    DiscardCardEvent?.Invoke(this, heldValue);
-        //    return;
-        //}
+        // While in DeckDraw, if we clicked on the discard pile
+        if (_serverComm.HandManager.TopDiscardCardId == InputRegistry.First().ButtonId.Value)
+        {
+            _serverComm.SendDiscardPacket();
+            //TODO: Add event for managing a discard anim occurring
+            return;
+        }
 
-        //_serverComm.SendSwapPacket((ushort)InputRegistry.First().ButtonId.Value, _serverComm.HandManager.TopDiscardCardId);
+        // The case that we didn't click the discard pile, this means a swap between held card and the card in hand
+        _serverComm.SendSwapPacket((ushort)InputRegistry.First().ButtonId.Value, _serverComm.HandManager.HeldCardId);
+        // Now we have the held card is the card that was previously in hand. We are forced to discard this
+        _serverComm.SendDiscardPacket();
     }
 
     // performance suffers when creating 50+ NEW textures per frame
@@ -332,11 +476,7 @@ public class Game1: Game
             new(_graphics.PreferredBackBufferWidth - _arial.MeasureString(output).X - 10, _arial.MeasureString(output).Y * 2),
             Color.Green);
 
-        _spriteBatch.DrawString(
-            _arial,
-            _debugString,
-            new(_graphics.PreferredBackBufferWidth - _arial.MeasureString(_debugString).X - 10, _arial.MeasureString(_debugString).Y * 4),
-            Color.Black);
+        DebugTextVisualiser.DrawAllText(_spriteBatch, _arial, _debugTextView);
 
         _spriteBatch.End();
 
@@ -346,6 +486,21 @@ public class Game1: Game
     // TODO: the skip, pass and call buttons
     private void UpdateValidInputs(object? sender, GameState state)
     {
+        // When we move states, we want to unselect all the cards
+        // Except in the case that the state requires a card selection (so the user doesn't have to re-enter it)
+        if (_gameStateMachine.CurrentState != GameState.QuickPlace)
+        {
+            if (InputRegistry.Count > 0)
+            {
+                IButton[] buttons = [.. InputRegistry];
+                // Buttons in the input registry are put there with a click and removed with a click
+                foreach (IButton button in buttons)
+                {
+                    button.Click();
+                }
+            }
+        }
+
         // Exclude already selected cards, all cancellation done through right click/separate action
         IEnumerable<int> validIds =
             _inputValidator
@@ -353,11 +508,13 @@ public class Game1: Game
             .Select(id => (int)id)
             .Except(InputRegistry.Select(button => button.ButtonId.Value));
 
-        _debugString = "Ids: ";
+        var sb = new StringBuilder("Ids: ");
         foreach (var item in validIds)
         {
-            _debugString += item.ToString();
+            sb.Append(item.ToString());
         }
+
+        DebugTextVisualiser.AddDrawMeText(new(sb.ToString()));
 
         var allHandsCards = _handViews.SelectMany(hand => hand.DisplayCards).ToList();
         allHandsCards.ForEach(card =>
@@ -369,17 +526,18 @@ public class Game1: Game
         nonCardButtons = nonCardButtons.Concat(_handViews);
         nonCardButtons.ToList().ForEach(button => button.Clickable = false);
 
-        switch (_gameStateMachine.CurrentState)
+        if (_gameStateMachine.CurrentState == GameState.Scramble)
         {
-            case GameState.Scramble:
-                _handViews.ForEach(hand => hand.Clickable = true);
-                break;
-            case GameState.QuickPlace:
-                _deckView.Clickable = true;
-                break;
-            default:
-                break;
+            _handViews.ForEach(hand => hand.Clickable = true);
         }
+
+        // _deckView is not initialise until left the state of initialisation
+        if (_gameStateMachine.CurrentState != GameState.Initialisation)
+        {
+            _deckView.Clickable = _inputValidator.CheckCanQuickPlace(_gameStateMachine.CurrentState, _serverComm.PlayerId, _serverComm.TurnPlayerId);
+        }
+
+        // TODO: pass it and call it buttons
     }
 
     private void OnDeckClicked(object? sender, EventArgs e)
@@ -391,7 +549,9 @@ public class Game1: Game
             return;
         }
 
-        if (_gameStateMachine.CurrentState == GameState.QuickPlace)
+        // TODO: Alter so this check isn't needed OR ensure this check is made everywhere it is needed
+        // Check to ensure user has a card selected in order to Quick Place. THey may have entered Quick Place then unselected everything...
+        if (_gameStateMachine.CurrentState == GameState.QuickPlace && InputRegistry.Count > 0)
         {
             // We are not triggering deck click here, because when in QP only the next CardAction (or cancel) is relevant to the state machine
             _serverComm.SendQuickPlacePacket((ushort)InputRegistry.First().ButtonId.Value);

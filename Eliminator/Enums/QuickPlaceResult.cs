@@ -1,5 +1,5 @@
 ﻿namespace Eliminator;
-public enum QuickPlaceSuccess: byte
+public enum QuickPlaceResult: byte
 {
     Success = 0, // Player made a successful QuickPlace
     Failure = 1, // Player made a failed QuickPlace

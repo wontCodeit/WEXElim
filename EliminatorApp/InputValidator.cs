@@ -44,14 +44,10 @@ public class InputValidator
 
             case GameState.Waiting: // Transitions to QP
             case GameState.TurnEnd: // Transitions to QP
-                return UserIsLocked(userId, currentPlayerId)
-                    ? []
-                    : GetCardsInHand(userId).Select(card => card.Id);
+                return GetCardsFromQP(userId, currentPlayerId);
 
             case GameState.TurnStart: // May transition to QP
-                IEnumerable<ushort> fromQuickPlace = UserIsLocked(userId, currentPlayerId)
-                    ? []
-                    : GetCardsInHand(userId).Select(card => card.Id);
+                IEnumerable<ushort> fromQuickPlace = GetCardsFromQP(userId, currentPlayerId);
                 return fromQuickPlace.Append(_handManager.TopDiscardCardId);
 
             case GameState.DeckDraw: // Swap with any card in hand or discard immediately
@@ -90,6 +86,20 @@ public class InputValidator
     {
         _isCalled = true;
         _callItPlayerId = callingPlayerId;
+    }
+
+    /// <summary>
+    /// Check if quick placing is allowed
+    /// </summary>
+    /// <param name="currentState"> The <see cref="GameState"/> that you are querying for </param>
+    /// <param name="userId"> The id of the player you are querying for i.e. the person who might quick place </param>
+    /// <param name="currentPlayerId"> The id of the turn player i.e. whose turn it is </param>
+    /// <returns> Whether the specified user, for the specified game state, can make a QuickPlace </returns>
+    public bool CheckCanQuickPlace(GameState currentState, byte userId, byte currentPlayerId)
+    {
+        return _handManager.RemainingCards > 0
+            && (currentState == GameState.TurnStart || currentState == GameState.TurnEnd || currentState == GameState.Waiting || currentState == GameState.QuickPlace)
+            && !UserIsLocked(userId, currentPlayerId);
     }
 
     public bool CheckCanDraw(GameState currentState) => (currentState == GameState.TurnStart) && (_handManager.RemainingCards > 0);
@@ -159,6 +169,19 @@ public class InputValidator
         {
             return [];
         }
+    }
+
+    /// <summary>
+    /// Assumes correct state. Returns nothing if QP is not valid, if it is returns cards in hand
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="currentPlayerId"></param>
+    /// <returns></returns>
+    private IEnumerable<ushort> GetCardsFromQP(byte userId, byte currentPlayerId)
+    {
+        return UserIsLocked(userId, currentPlayerId) || _handManager.RemainingCards == 0
+                    ? []
+                    : GetCardsInHand(userId).Select(card => card.Id);
     }
 
     private List<ICard> GetCardsInHand(byte userId) => _handManager.GetCardsInHand(userId);
