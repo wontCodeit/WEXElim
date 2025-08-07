@@ -89,6 +89,7 @@ public class GameStateMachine
 
         _ = _stateMachine.Configure(GameState.SwapCardInHands)
             .Permit(Trigger.CancelAction, GameState.TurnEnd)
+            .IgnoreIf(_selectionUpdateTrigger, inputs => inputs.Count() < 2) // If Card selection reset between states, allow selecting 2 in this state
             .PermitDynamicIf(_selectionUpdateTrigger,
                              ExitStateFromCardAction,
                              inputs => inputs.Count() == 2 && (CardsAreInHand(inputs) || CardsAreInOtherHand(inputs)));

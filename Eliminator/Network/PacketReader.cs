@@ -175,6 +175,7 @@ public class PacketReader: BinaryReader
     {
         var startingCards = ReadInt32();
         var deckSize = ReadInt32();
+        var initialDiscard = (CardValue)ReadByte();
         var turnTimeLimit = ReadInt32();
         var playerCount = ReadByte();
         List<(byte, string)> players = [];
@@ -185,7 +186,7 @@ public class PacketReader: BinaryReader
         }
 
         _waitingPackets.Enqueue(new
-            ProcessedInitialiseGamePacket(_senderId, startingCards, deckSize, turnTimeLimit, players));
+            ProcessedInitialiseGamePacket(_senderId, startingCards, deckSize, initialDiscard, turnTimeLimit, players));
     }
 
     private void ReadDisconnection()

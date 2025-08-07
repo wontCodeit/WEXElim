@@ -16,11 +16,6 @@ internal class MockClientGameManager: IClientGameManager
     private readonly CardCounter _serverCardCounter = new();
     private readonly CardCounter _clientCardCounter = new();
 
-    // In order to manipulate cards via events, usually both the CardValue and id are needed, both of which are not
-    // always passed by the event(s) because of how packets are done (minimising data transfer)
-    // TODO: This could be refactored to be an additional parameter on certain events (depending on if Game1 needs it)
-    private readonly ushort _cardIdToAlter = 0;
-
     public HandManager? HandManager { get; private set; }
 
     public string Name { get; init; }
@@ -28,6 +23,10 @@ internal class MockClientGameManager: IClientGameManager
     public byte PlayerId { get; }
 
     public byte TurnPlayerId { get; private set; } = 255;
+
+    public CardValue? HeldCardValue => _clientCardCounter.GetNumber(HandManager.HeldCardId);
+
+    public CardValue TopDiscardValue => _clientCardCounter.GetNumber(HandManager.TopDiscardCardId) ?? CardValue.Back; // after initialisation, is not null
 
     #region events
     public event EventHandler<EventArgs>? FatalErrorEvent;
@@ -51,6 +50,15 @@ internal class MockClientGameManager: IClientGameManager
         PlayerId = id;
         HandManager = new((byte)igPacket.Players.Count, igPacket.StartingCards, new BlankDeck(1), _clientCardCounter);
         _serverHM = new((byte)igPacket.Players.Count, igPacket.StartingCards, new Deck(1), _serverCardCounter);
+
+        // We would usually use the igPacket's discard card, but in this case it doesn't align with the server deck so it is ignored
+        _serverHM.DrawCard();
+        _serverHM.DiscardHeldCard();
+        var initialDiscard = (CardValue)_serverCardCounter.GetNumber(_serverHM.TopDiscardCardId)!;
+        HandManager.DrawCard();
+        HandManager.DiscardHeldCard();
+        _serverCardCounter.ChangePlaceholderNumber(HandManager.TopDiscardCardId, initialDiscard);
+        _clientCardCounter.ChangePlaceholderNumber(HandManager.TopDiscardCardId, initialDiscard);
 
         DrawResultEvent += OnDrawResult;
         DiscardResultEvent += OnDiscardResult;
@@ -91,11 +99,6 @@ internal class MockClientGameManager: IClientGameManager
     // Simulates delay from server, but assumes always success(?)/simplest case
     private void Run()
     {
-        _serverHM.DrawCard();
-        _serverHM.DiscardHeldCard();
-        HandManager.DrawCard();
-        HandManager.DiscardHeldCard();
-
         while (true)
         {
             if (!PacketReader.NextPacketReady())
