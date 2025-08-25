@@ -94,5 +94,25 @@ public static class Extensions
         // All others
         return CardAction.None;
     }
+
+    /// <summary>
+    /// Convert the <see cref="CardValue"/> into its respective point value as per Eliminator rules
+    /// </summary>
+    /// <param name="card"> The <see cref="CardValue"/> to map a point value from </param>
+    /// <returns> point value of the respective card </returns>
+    public static int AsPointValue(this CardValue card)
+    {
+        var underlyingValue = (byte)card;
+        if (underlyingValue > 52) // Jokers take away 2
+        {
+            return -2;
+        }
+        else if (underlyingValue is 26 or 39) // Red Kings add 13, Black Kings add 0
+        {
+            return 13;
+        }
+
+        return underlyingValue % 13;
+    }
 }
 

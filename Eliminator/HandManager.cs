@@ -354,13 +354,15 @@ public class HandManager
             throw new ArgumentException($"Requested card with id: {cardId} could not be found");
         }
 
-        if (_counter.GetNumber(TopDiscardCardId) != cardToPlace?.Number)
+        // Cards are treated as the same if they have the same number, regardless of suit (e.g. 4 of clubs is the same as 4 of diamonds)
+        if ((byte)_counter.GetNumber(TopDiscardCardId)! % 13 == (byte)cardToPlace?.Number % 13
+            || ((byte)_counter.GetNumber(TopDiscardCardId)! > 52 && (byte)cardToPlace?.Number > 52)) // Jokers are only equal to each other
         {
-            return false;
+            ToDiscard((CardValue)cardToPlace?.Number!);
+            return hand.Remove(cardToPlace!);
         }
 
-        ToDiscard((CardValue)cardToPlace?.Number!);
-        return hand.Remove(cardToPlace!);
+        return false;
     }
 
     /// <summary>
@@ -399,19 +401,7 @@ public class HandManager
             var handSum = 0;
             hand.Value.ToList().ForEach(card =>
             {
-                var underlyingValue = (byte)card.Number!;
-                if (underlyingValue > 52) // Jokers take away 2
-                {
-                    handSum -= 2;
-                }
-                else if (underlyingValue is 26 or 39) // Red Kings add 13, Black Kings add 0
-                {
-                    handSum += 13;
-                }
-                else
-                {
-                    handSum += underlyingValue % 13;
-                }
+                handSum += card!.Number!.Value.AsPointValue();
             });
 
             playerHandValues.Add((hand.Key, handSum));

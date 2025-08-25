@@ -83,11 +83,12 @@ public static class PacketWriter
     /// <param name="turnTimeLimit"> The time limit on a player's turn in seconds </param>
     /// <param name="users"> List of players ids + usernames </param>
     /// <returns> The packet as a <see cref="byte"/> array </returns>
-    public static byte[] WriteInitialiseGamePacket(int startingCards, int deckSize, int turnTimeLimit, List<(byte, string)> users)
+    public static byte[] WriteInitialiseGamePacket(int startingCards, int deckSize, CardValue initialDiscard, int turnTimeLimit, List<(byte, string)> users)
     {
         WriteToPacket(OpCode.InitialiseGame);
         WriteToPacket(startingCards);
         WriteToPacket(deckSize);
+        WriteToPacket(initialDiscard);
         WriteToPacket(turnTimeLimit);
         WriteToPacket((byte)users.Count);
         users.ForEach(user =>

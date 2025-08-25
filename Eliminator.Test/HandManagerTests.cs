@@ -61,8 +61,13 @@ public class HandManagerTests
         HandManager handManager = new(1, 2, new Deck(1), cardCounter);
         var cardIds = handManager.GetCardsInHand(0).Select(card => card.Id).ToList();
         var cardToPlace = cardIds[0];
-        var cardValue = (CardValue)cardCounter.GetNumber((ushort)(cardToPlace + 1))!;
-        handManager.ToDiscard(cardValue);
+
+        var notCardToPlace = (CardValue)cardCounter.GetNumber(cardToPlace)!;
+        notCardToPlace = (byte)notCardToPlace >= (byte)CardValue.JokerBlack
+            ? CardValue.SpadesAce
+            : CardValue.JokerBlack;
+
+        handManager.ToDiscard(notCardToPlace);
 
         Assert.False(handManager.QuickPlace(cardIds[0]));
         Assert.Contains(

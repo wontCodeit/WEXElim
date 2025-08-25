@@ -20,7 +20,7 @@ public interface ICard
     public void ChangeNumber(CardValue value);
 }
 
-public class CardComparer: IEqualityComparer<ICard>
+public class CardIdComparer: IEqualityComparer<ICard>
 {
     public bool Equals(ICard? x, ICard? y)
     {

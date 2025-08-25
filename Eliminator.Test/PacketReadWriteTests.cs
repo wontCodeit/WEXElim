@@ -111,9 +111,10 @@ public class PacketReadWriteTests
         var reader = new PacketReader(netStream, 255); // 255 will be from server
         var startCards = 4;
         var deckSize = 1;
+        CardValue initialDiscard = CardValue.SpadesAce;
         var turnTimeLimit = 30;
         List<(byte, string)> players = [(0, "Jemima Banks"), (1, "Kaladin"), (2, "Kelsier"), (3, "Kalak"), (4, "K2")];
-        var packet = PacketWriter.WriteInitialiseGamePacket(startCards, deckSize, turnTimeLimit, players);
+        var packet = PacketWriter.WriteInitialiseGamePacket(startCards, deckSize, initialDiscard, turnTimeLimit, players);
         _ = _sock.Send(packet);
         var packetOpCode = (OpCode)reader.ReadByte();
 
@@ -128,6 +129,7 @@ public class PacketReadWriteTests
         Assert.NotNull(unboxedPacket);
         Assert.Equal(startCards, unboxedPacket.StartingCards);
         Assert.Equal(deckSize, unboxedPacket.DeckSize);
+        Assert.Equal(initialDiscard, unboxedPacket.InitialDiscard);
         Assert.Equal(turnTimeLimit, unboxedPacket.TurnTimeLimit);
         Assert.Equal(players, unboxedPacket.Players);
     }
