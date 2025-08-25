@@ -20,8 +20,7 @@ public class Deck: IDeck
         IEnumerable<CardValue> enums = Enum.GetValues(typeof(CardValue)).Cast<CardValue>();
         for (var i = 0; i < amount; i++)
         {
-            var max = (byte)enums.Max();
-            for (var j = 1; j <= max; j++)
+            for (var j = 1; j < enums.Count(); j++) // start at 1, to ignore CardBack
             {
                 _deck.Push(enums.ElementAt(j));
             }

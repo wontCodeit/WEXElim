@@ -72,6 +72,7 @@ public class GameStateMachine
 
         _ = _stateMachine.Configure(GameState.DiscardSwap)
             .Permit(Trigger.CancelAction, GameState.TurnStart)
+            .IgnoreIf(_selectionUpdateTrigger, inputs => inputs.Count() < 2) // If Card selection reset between states, allow selecting 2 in this state
             .PermitDynamic(_doCardActionTrigger, CardActionToState);
 
         _ = _stateMachine.Configure(GameState.TurnEnd)
@@ -166,8 +167,8 @@ public class GameStateMachine
     private bool SelectedCardIsDiscardCard(IEnumerable<IButton> inputReg)
     {
         return inputReg.Any()
-            && inputReg.First() is FixedCard card
-            && _handManager.TopDiscardCardId == ((ushort)card.ButtonId.Value);
+            && inputReg.First() is IButton button
+            && _handManager.TopDiscardCardId == ((ushort)button.ButtonId.Value);
     }
 
     private GameState CardActionToState(CardAction cardAction)

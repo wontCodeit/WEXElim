@@ -124,7 +124,18 @@ public class Game1: Game
         base.Initialize();
     }
 
-    private void OnDiscardClicked(object? sender, EventArgs e) => throw new NotImplementedException();
+    private void OnDiscardClicked(object? sender, EventArgs e)
+    {
+        var discardPile = (IButton)sender!;
+        if (InputRegistry.Contains(discardPile))
+        {
+            _ = InputRegistry.Remove(discardPile);
+            return;
+        }
+
+        InputRegistry.Add(discardPile); // add the discard pile (i.e. top discard card) to the registry
+        _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
+    }
 
     #region IClientGameManager Event Responses
     private void OnStartTurn(object? sender, ProcessedStartTurnPacket? packet)
@@ -279,7 +290,7 @@ public class Game1: Game
         _discardView = new DiscardPileView(
             _configFromServer.InitialDiscard,
             DiscardClickedEvent,
-            new ButtonId(),
+            new ButtonId(_serverComm.HandManager.TopDiscardCardId),
             new RenderTarget2D(_graphics.GraphicsDevice, CARD_WIDTH, CARD_HEIGHT),
             new DisplaySpace(new((screenWidth / 2) + CARD_WIDTH + 10, (screenHeight / 2) - deckDisplayHeight), 0f));
 
@@ -410,36 +421,39 @@ public class Game1: Game
     /// <param name="clickHappened"></param>
     private void HandleCardClicked()
     {
-        if (_gameStateMachine.CurrentState is not GameState.DeckDraw)
+        switch (_gameStateMachine.CurrentState)
         {
-            if (InputRegistry.Count > 0)
-            {
+            case GameState.TurnStart:
+            case GameState.TurnEnd:
+            case GameState.Waiting:
+            case GameState.SwapCardInHands:
                 _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
                 return;
-            }
+
+            case GameState.DiscardSwap:
+                _serverComm.DoDiscardSwap((ushort)InputRegistry[1].ButtonId.Value);
+                //TODO: Add event for managing a discard anim occurring
+                return;
+
+            case GameState.DeckDraw:
+                _serverComm.SendSwapPacket((ushort)InputRegistry.First().ButtonId.Value, _serverComm.HandManager.HeldCardId);
+                _serverComm.SendDiscardPacket(); // held card is now the card that was in hand. Must discard
+                return;
+
+            case GameState.PeekSelf:
+            case GameState.PeekOther:
+                _serverComm.SendPeekPacket((ushort)InputRegistry.First().ButtonId.Value);
+                _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
+                return;
+
+            case GameState.QuickPlace: // shouldn't be possible
+            case GameState.Scramble: // shouldn't be possible
+            case GameState.Initialisation: // shouldn't be possible
+                throw new InvalidOperationException("HandleCardClicked for the current GameState is illogical, for no cards should be valid");
+
+            default:
+                throw new NotImplementedException("GameState has no response in HandleCardClicked");
         }
-
-        if (InputRegistry.Count != 1)
-        {
-            Debug.WriteLine($"Card clicked while in {_gameStateMachine.CurrentState} state, but InputRegistry empty!");
-            return;
-        }
-
-        // TODO: I think the below logic needs moving or changing. THis function is broken
-        // because it allows Swap even when Card not clickable i.e. clickHappened False
-
-        // While in DeckDraw, if we clicked on the discard pile
-        if (_serverComm.HandManager.TopDiscardCardId == InputRegistry.First().ButtonId.Value)
-        {
-            _serverComm.SendDiscardPacket();
-            //TODO: Add event for managing a discard anim occurring
-            return;
-        }
-
-        // The case that we didn't click the discard pile, this means a swap between held card and the card in hand
-        _serverComm.SendSwapPacket((ushort)InputRegistry.First().ButtonId.Value, _serverComm.HandManager.HeldCardId);
-        // Now we have the held card is the card that was previously in hand. We are forced to discard this
-        _serverComm.SendDiscardPacket();
     }
 
     // performance suffers when creating 50+ NEW textures per frame
@@ -497,7 +511,7 @@ public class Game1: Game
     {
         // When we move states, we want to unselect all the cards
         // Except in the case that the state requires a card selection (so the user doesn't have to re-enter it)
-        if (_gameStateMachine.CurrentState != GameState.QuickPlace)
+        if (_gameStateMachine.CurrentState != GameState.QuickPlace && _gameStateMachine.CurrentState != GameState.DiscardSwap)
         {
             if (InputRegistry.Count > 0)
             {
@@ -545,6 +559,7 @@ public class Game1: Game
         {
             _deckView.Clickable = _inputValidator.CheckCanQuickPlace(_gameStateMachine.CurrentState, _serverComm.PlayerId, _serverComm.TurnPlayerId);
 
+            _discardView.Clickable = _gameStateMachine.CurrentState == GameState.TurnStart;
             // Also alter the displayed discard card value if necessary
             _discardView.DisplayedDiscardValue = _serverComm.TopDiscardValue;
         }

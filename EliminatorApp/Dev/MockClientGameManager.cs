@@ -1,6 +1,7 @@
 ﻿using Eliminator;
 using Eliminator.Network.ProcessedPackets;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,7 +50,25 @@ internal class MockClientGameManager: IClientGameManager
         Name = userName;
         PlayerId = id;
         HandManager = new((byte)igPacket.Players.Count, igPacket.StartingCards, new BlankDeck(1), _clientCardCounter);
-        _serverHM = new((byte)igPacket.Players.Count, igPacket.StartingCards, new Deck(1), _serverCardCounter);
+
+        List<CardValue> firstCards = [
+            CardValue.ClubsNine, // p1, card 1 (leftmost)
+            CardValue.SpadesFive,
+            CardValue.SpadesFour,
+            CardValue.SpadesThree,
+
+            CardValue.SpadesTwo, // p2
+            CardValue.SpadesAce,
+            CardValue.ClubsAce,
+            CardValue.ClubsTwo,
+
+            CardValue.ClubsThree, // p3
+            CardValue.ClubsFour,
+            CardValue.ClubsFive,
+            CardValue.ClubsSix,
+
+            CardValue.SpadesSix];
+        _serverHM = new((byte)igPacket.Players.Count, igPacket.StartingCards, new RiggedDeck(1, firstCards), _serverCardCounter);
 
         // We would usually use the igPacket's discard card, but in this case it doesn't align with the server deck so it is ignored
         _serverHM.DrawCard();
@@ -213,7 +232,6 @@ internal class MockClientGameManager: IClientGameManager
     {
         // OnPeekResult: Assign to the given card (for a finite duration!) and maybe send event for some animation to play
         PacketReader.ReadInternalPacket(new ProcessedPeekResultPacket(SERVER_ID, (CardValue)_serverCardCounter.GetNumber(cardId), cardId));
-        PacketReader.ReadInternalPacket(new ProcessedDisplayPeekPacket(SERVER_ID, cardId)); // TODO: I now believe this to be unnecessary
     }
 
     public void SendScramblePacket(byte playerId)
@@ -227,6 +245,14 @@ internal class MockClientGameManager: IClientGameManager
     {
         // OnGameEnd: Some sort of display signalled to Game1, this object to be disposed of, or if replayability CardCounter and HandManager to be replaced
         PacketReader.ReadInternalPacket(new ProcessedGameEndPacket(SERVER_ID, _serverHM.CalculateHandValues()));
+    }
+
+    public void DoDiscardSwap(ushort cardId)
+    {
+        var cv = (CardValue)_serverCardCounter.GetNumber(cardId)!;
+        _serverHM.ToDiscard(cv);
+        SendSwapPacket(cardId, _serverHM.TopDiscardCardId);
+        PacketReader.ReadInternalPacket(new ProcessedDiscardResultPacket(SERVER_ID, cv));
     }
     #endregion
 }

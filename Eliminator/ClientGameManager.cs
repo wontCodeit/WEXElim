@@ -206,4 +206,6 @@ public class ClientGameManager: IClientGameManager
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
+
+    public void DoDiscardSwap(ushort cardId) => throw new NotImplementedException();
 }

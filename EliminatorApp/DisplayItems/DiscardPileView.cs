@@ -18,7 +18,8 @@ public class DiscardPileView: IView, IButton
 
     public bool Clickable { get; set; }
 
-    public DiscardPileView(CardValue initialDiscard,
+    public DiscardPileView(
+                    CardValue initialDiscard,
                     EventHandler discardClickedEvent,
                     ButtonId deckButtonID,
                     RenderTarget2D view,
