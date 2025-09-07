@@ -14,6 +14,12 @@ public interface IClientGameManager: IDisposable
     public byte PlayerId { get; }
     public byte TurnPlayerId { get; }
 
+    public CardValue? HeldCardValue { get; }
+
+    // Realistically, during game play (i.e. outside of initialisation) this will never be null, so it shouldn't have been a place holder
+    // TODO: Remove "placeholder" altogether (somehow)
+    public CardValue TopDiscardValue { get; }
+
     // TODO: Not so sure all of these are nullable
     public event EventHandler<ProcessedGameEndPacket?>? GameEndEvent;
     public event EventHandler<ProcessedDisplayScramblePacket?>? DisplayScrambleEvent;
@@ -38,6 +44,8 @@ public interface IClientGameManager: IDisposable
     public void SendPeekPacket(ushort cardId);
     public void SendScramblePacket(byte playerId);
     public void SendCallItPacket();
+
+    public void DoDiscardSwap(ushort cardId);
 
     public void BeginRun();
 }

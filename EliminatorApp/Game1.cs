@@ -18,10 +18,15 @@ public class Game1: Game
     private const string CARD_IMG_FOLDER = "CardImages/";
     private readonly GraphicsDeviceManager _graphics;
     private readonly IClientGameManager _serverComm;
-    private readonly ProcessedInitialiseGamePacket _gameConfig;
+    private readonly ProcessedInitialiseGamePacket _configFromServer;
     private SpriteBatch _spriteBatch;
     private GameStateMachine _gameStateMachine;
+    private readonly List<IView> _views = [];
+    private readonly List<IButton> _miscButtons = [];
     private DeckView _deckView;
+    private DiscardPileView _discardView;
+    private List<HandView> _handViews = [];
+    private InputValidator _inputValidator;
 
     /// <summary>
     /// TODO: Remove when no longer needed
@@ -43,11 +48,6 @@ public class Game1: Game
 
     private float _screenScale = 1.0f;
     private Matrix _spriteScaleMatrix = Matrix.Identity;
-
-    private readonly List<IView> _views = [];
-    private readonly List<IButton> _miscButtons = [];
-    private List<HandView> _handViews = [];
-    private InputValidator _inputValidator;
 
     // Speed up / simplify calculations in HandView / FixedCard. Change these when the images change!
     // TODO: Alternatively, have HandView / FixedCard store this themselves from their texture that they get.
@@ -78,15 +78,16 @@ public class Game1: Game
     /// </summary>
     public static List<IButton> InputRegistry { get; } = [];
 
+    // TODO: DeckClicked and Discard Events could be replaced by passing a pointer to their respective On... methods instead
     public event EventHandler? InputRegistryChangedEvent;
     public event EventHandler? DeckClickedEvent;
-    public event EventHandler<CardValue?> DiscardCardEvent;
+    public event EventHandler? DiscardClickedEvent;
 
     public Game1(IClientGameManager cgm, ProcessedInitialiseGamePacket igPacket)
     {
         _graphics = new GraphicsDeviceManager(this);
         _serverComm = cgm;
-        _gameConfig = igPacket;
+        _configFromServer = igPacket;
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
@@ -118,8 +119,22 @@ public class Game1: Game
         UpdateValidInputs(_gameStateMachine, _gameStateMachine.CurrentState);
 
         DeckClickedEvent += OnDeckClicked;
+        DiscardClickedEvent += OnDiscardClicked;
 
         base.Initialize();
+    }
+
+    private void OnDiscardClicked(object? sender, EventArgs e)
+    {
+        var discardPile = (IButton)sender!;
+        if (InputRegistry.Contains(discardPile))
+        {
+            _ = InputRegistry.Remove(discardPile);
+            return;
+        }
+
+        InputRegistry.Add(discardPile); // add the discard pile (i.e. top discard card) to the registry
+        _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
     }
 
     #region IClientGameManager Event Responses
@@ -214,19 +229,15 @@ public class Game1: Game
         if (quickPlaceResultPacket!.Result == QuickPlaceResult.Success)
         {
             DebugTextVisualiser.AddDrawMeText("OnQuickPlaceResult:: SUCCESS!", Color.Green, 360);
-            IEnumerable<ICard> cardRemoved = cardsInView.ExceptBy(cardsInView, c => c, new CardComparer());
-
-            foreach (ICard card in cardRemoved)
-            {
-                _ = qpPlayer.RemoveFixedCard(card);
-            }
+            ICard cardRemoved = cardsInView.First(card => card.Id == quickPlaceResultPacket.CardId);
+            _ = qpPlayer.RemoveFixedCard(cardRemoved);
 
             return;
         }
 
         DebugTextVisualiser.AddDrawMeText("OnQuickPlaceResult:: PUNISHMENT!", Color.Red, 360);
 
-        IEnumerable<ICard> cardToAdd = cardsInHand.ExceptBy(cardsInView, c => c, new CardComparer());
+        IEnumerable<ICard> cardToAdd = cardsInHand.ExceptBy(cardsInView, c => c, new CardIdComparer());
         foreach (ICard card in cardToAdd)
         {
             _ = qpPlayer.AddFixedCard(card);
@@ -276,8 +287,17 @@ public class Game1: Game
                  new RenderTarget2D(_graphics.GraphicsDevice, CARD_WIDTH, deckDisplayHeight),
                  new DisplaySpace(new((screenWidth / 2) - CARD_WIDTH, (screenHeight / 2) - deckDisplayHeight), 0f));
 
+        _discardView = new DiscardPileView(
+            _configFromServer.InitialDiscard,
+            DiscardClickedEvent,
+            new ButtonId(_serverComm.HandManager.TopDiscardCardId),
+            new RenderTarget2D(_graphics.GraphicsDevice, CARD_WIDTH, CARD_HEIGHT),
+            new DisplaySpace(new((screenWidth / 2) + CARD_WIDTH + 10, (screenHeight / 2) - deckDisplayHeight), 0f));
+
         _miscButtons.Add(_deckView);
+        _miscButtons.Add(_discardView);
         _views.Add(_deckView);
+        _views.Add(_discardView);
         _views.AddRange(_handViews);
     }
 
@@ -401,36 +421,39 @@ public class Game1: Game
     /// <param name="clickHappened"></param>
     private void HandleCardClicked()
     {
-        if (_gameStateMachine.CurrentState is not GameState.DeckDraw)
+        switch (_gameStateMachine.CurrentState)
         {
-            if (InputRegistry.Count > 0)
-            {
+            case GameState.TurnStart:
+            case GameState.TurnEnd:
+            case GameState.Waiting:
+            case GameState.SwapCardInHands:
                 _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
                 return;
-            }
+
+            case GameState.DiscardSwap:
+                _serverComm.DoDiscardSwap((ushort)InputRegistry[1].ButtonId.Value);
+                //TODO: Add event for managing a discard anim occurring
+                return;
+
+            case GameState.DeckDraw:
+                _serverComm.SendSwapPacket((ushort)InputRegistry.First().ButtonId.Value, _serverComm.HandManager.HeldCardId);
+                _serverComm.SendDiscardPacket(); // held card is now the card that was in hand. Must discard
+                return;
+
+            case GameState.PeekSelf:
+            case GameState.PeekOther:
+                _serverComm.SendPeekPacket((ushort)InputRegistry.First().ButtonId.Value);
+                _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
+                return;
+
+            case GameState.QuickPlace: // shouldn't be possible
+            case GameState.Scramble: // shouldn't be possible
+            case GameState.Initialisation: // shouldn't be possible
+                throw new InvalidOperationException("HandleCardClicked for the current GameState is illogical, for no cards should be valid");
+
+            default:
+                throw new NotImplementedException("GameState has no response in HandleCardClicked");
         }
-
-        if (InputRegistry.Count != 1)
-        {
-            Debug.WriteLine($"Card clicked while in {_gameStateMachine.CurrentState} state, but InputRegistry empty!");
-            return;
-        }
-
-        // TODO: I think the below logic needs moving or changing. THis function is broken
-        // because it allows Swap even when Card not clickable i.e. clickHappened False
-
-        // While in DeckDraw, if we clicked on the discard pile
-        if (_serverComm.HandManager.TopDiscardCardId == InputRegistry.First().ButtonId.Value)
-        {
-            _serverComm.SendDiscardPacket();
-            //TODO: Add event for managing a discard anim occurring
-            return;
-        }
-
-        // The case that we didn't click the discard pile, this means a swap between held card and the card in hand
-        _serverComm.SendSwapPacket((ushort)InputRegistry.First().ButtonId.Value, _serverComm.HandManager.HeldCardId);
-        // Now we have the held card is the card that was previously in hand. We are forced to discard this
-        _serverComm.SendDiscardPacket();
     }
 
     // performance suffers when creating 50+ NEW textures per frame
@@ -488,7 +511,7 @@ public class Game1: Game
     {
         // When we move states, we want to unselect all the cards
         // Except in the case that the state requires a card selection (so the user doesn't have to re-enter it)
-        if (_gameStateMachine.CurrentState != GameState.QuickPlace)
+        if (_gameStateMachine.CurrentState != GameState.QuickPlace && _gameStateMachine.CurrentState != GameState.DiscardSwap)
         {
             if (InputRegistry.Count > 0)
             {
@@ -531,10 +554,14 @@ public class Game1: Game
             _handViews.ForEach(hand => hand.Clickable = true);
         }
 
-        // _deckView is not initialise until left the state of initialisation
+        // _deckView and discard view are not initialised during the game state of initialisation
         if (_gameStateMachine.CurrentState != GameState.Initialisation)
         {
             _deckView.Clickable = _inputValidator.CheckCanQuickPlace(_gameStateMachine.CurrentState, _serverComm.PlayerId, _serverComm.TurnPlayerId);
+
+            _discardView.Clickable = _gameStateMachine.CurrentState == GameState.TurnStart;
+            // Also alter the displayed discard card value if necessary
+            _discardView.DisplayedDiscardValue = _serverComm.TopDiscardValue;
         }
 
         // TODO: pass it and call it buttons

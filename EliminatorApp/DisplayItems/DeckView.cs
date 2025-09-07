@@ -47,7 +47,7 @@ public class DeckView: IButton, IView
         return rect.Contains(point);
     }
 
-    public void Click() => _deckClickedEvent.Invoke(this, new());
+    public void Click() => _deckClickedEvent.Invoke(this, EventArgs.Empty);
 
     public void Draw(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
     {

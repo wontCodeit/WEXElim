@@ -83,20 +83,21 @@ public class HostGameManager
     public void Run(int turnTimeLimit = 30)
     {
         _run = true;
+
+        // Implicit in game start, the discard pile always holds at least one card value
+        _handManager.DrawCard();
+        _handManager.DiscardHeldCard();
         _server.BroadcastAll(
             PacketWriter.WriteInitialiseGamePacket(
                 _handManager.InitialisationInfo.startingCards,
                 _handManager.InitialisationInfo.deckSize,
+                (CardValue)_counter.GetNumber(_handManager.TopDiscardCardId)!,
                 turnTimeLimit,
                 _server.ConnectedPlayers())
             );
         Console.WriteLine("Sent initialise game packet");
 
         Thread.Sleep(1_000); // Wait for client game to start TODO: Remove by being more clever
-
-        // Implicit in game start, the discard pile always holds at least one card value
-        _handManager.DrawCard();
-        _handManager.DiscardHeldCard();
 
         var r = new Random();
         _turnPlayerId = (byte)r.Next(0, _playerIds.Last());

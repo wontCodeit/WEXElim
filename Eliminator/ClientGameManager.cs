@@ -24,6 +24,10 @@ public class ClientGameManager: IClientGameManager
     public byte PlayerId => _serverAccess.Id;
     public byte TurnPlayerId { get; private set; } = 255;
 
+    public CardValue? HeldCardValue => _counter.GetNumber(HandManager.HeldCardId);
+
+    public CardValue TopDiscardValue => _counter.GetNumber(HandManager.TopDiscardCardId) ?? CardValue.Back; // after initialisation, is not null
+
     #region events
     public event EventHandler<ProcessedDrawResultPacket?>? DrawResultEvent;
     public event EventHandler<ProcessedStartTurnPacket?>? StartTurnEvent;
@@ -147,6 +151,7 @@ public class ClientGameManager: IClientGameManager
         // At game start, discard pile always has a card in it
         HandManager.DrawCard();
         HandManager.DiscardHeldCard();
+        _counter.ChangePlaceholderNumber(HandManager.TopDiscardCardId, igPacket.InitialDiscard);
     }
 
     private void OnStartTurn(object? sender, ProcessedStartTurnPacket? stPacket)
@@ -201,4 +206,6 @@ public class ClientGameManager: IClientGameManager
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
+
+    public void DoDiscardSwap(ushort cardId) => throw new NotImplementedException();
 }

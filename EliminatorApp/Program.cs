@@ -11,7 +11,8 @@ using System;
 // TODO: Allow launch via EliminatorApp entrypoint
 // =====================================================================================================================
 Console.WriteLine("Launch via Eliminator.Client for now, if you aren't debugging!");
-var igPacket = new Eliminator.Network.ProcessedPackets.ProcessedInitialiseGamePacket(255, 4, 1, 30, [(0, "W1"), (1, "W2"), (2, "W3")]);
+// Mock client game manager ignores the card value in the initialise game packet (because it creates its own decks)
+var igPacket = new Eliminator.Network.ProcessedPackets.ProcessedInitialiseGamePacket(255, 4, 1, Eliminator.CardValue.Back, 30, [(0, "W1"), (1, "W2"), (2, "W3")]);
 var mockCGM = new MockClientGameManager("W1", 0, igPacket);
 mockCGM.BeginRun();
 Game1 game = new(mockCGM, igPacket);
