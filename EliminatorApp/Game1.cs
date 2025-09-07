@@ -16,6 +16,7 @@ namespace EliminatorApp;
 public class Game1: Game
 {
     private const string CARD_IMG_FOLDER = "CardImages/";
+    private const string BUTTON_IMG_FOLDER = "ButtonImages/";
     private readonly GraphicsDeviceManager _graphics;
     private readonly IClientGameManager _serverComm;
     private readonly ProcessedInitialiseGamePacket _configFromServer;
@@ -25,6 +26,7 @@ public class Game1: Game
     private readonly List<IButton> _miscButtons = [];
     private DeckView _deckView;
     private DiscardPileView _discardView;
+    private EndTurnButton _endTurnButton;
     private List<HandView> _handViews = [];
     private InputValidator _inputValidator;
 
@@ -82,6 +84,7 @@ public class Game1: Game
     public event EventHandler? InputRegistryChangedEvent;
     public event EventHandler? DeckClickedEvent;
     public event EventHandler? DiscardClickedEvent;
+    public event EventHandler? EndTurnClickedEvent;
 
     public Game1(IClientGameManager cgm, ProcessedInitialiseGamePacket igPacket)
     {
@@ -120,6 +123,7 @@ public class Game1: Game
 
         DeckClickedEvent += OnDeckClicked;
         DiscardClickedEvent += OnDiscardClicked;
+        EndTurnClickedEvent += OnEndTurnClicked;
 
         base.Initialize();
     }
@@ -294,8 +298,17 @@ public class Game1: Game
             new RenderTarget2D(_graphics.GraphicsDevice, CARD_WIDTH, CARD_HEIGHT),
             new DisplaySpace(new((screenWidth / 2) + CARD_WIDTH + 10, (screenHeight / 2) - deckDisplayHeight), 0f));
 
+        Texture2D endTurnTexture = Content.Load<Texture2D>(BUTTON_IMG_FOLDER + "EndTurn");
+        var endTurnY = screenHeight - endTurnTexture.Height - 40;
+        var endTurnX = 0 + 10;
+        _endTurnButton = new EndTurnButton(
+            new DisplaySpace(new(endTurnX, endTurnY), 0f),
+            endTurnTexture,
+            EndTurnClickedEvent);
+
         _miscButtons.Add(_deckView);
         _miscButtons.Add(_discardView);
+        _miscButtons.Add(_endTurnButton);
         _views.Add(_deckView);
         _views.Add(_discardView);
         _views.AddRange(_handViews);
@@ -492,6 +505,24 @@ public class Game1: Game
                 0f);
         });
 
+        Color drawColor = Color.Gray;
+
+        if (_endTurnButton.Clickable)
+        {
+            drawColor = Color.White;
+        }
+
+        _spriteBatch.Draw(
+            _endTurnButton.Texture,
+            _endTurnButton.DisplaySpace.Position,
+            null,
+            drawColor,
+            0f,
+            new(),
+            1,
+            SpriteEffects.None,
+            0f);
+
         var output = _gameStateMachine.CurrentState.ToString();
         _spriteBatch.DrawString(
             _arial,
@@ -562,9 +593,10 @@ public class Game1: Game
             _discardView.Clickable = _gameStateMachine.CurrentState == GameState.TurnStart;
             // Also alter the displayed discard card value if necessary
             _discardView.DisplayedDiscardValue = _serverComm.TopDiscardValue;
-        }
 
-        // TODO: pass it and call it buttons
+            // TODO: call it button
+            _endTurnButton.Clickable = _inputValidator.CheckCanPass(_gameStateMachine.CurrentState);
+        }
     }
 
     private void OnDeckClicked(object? sender, EventArgs e)
@@ -583,6 +615,12 @@ public class Game1: Game
             // We are not triggering deck click here, because when in QP only the next CardAction (or cancel) is relevant to the state machine
             _serverComm.SendQuickPlacePacket((ushort)InputRegistry.First().ButtonId.Value);
         }
+    }
+
+    private void OnEndTurnClicked(object? sender, EventArgs e)
+    {
+        _gameStateMachine.FireEndTurnTrigger();
+        _serverComm.SendPassItPacket();
     }
 
     // TODO: Clean up based on what cancelling actually requires e.g. are we calling this twice when receiving packet or nah

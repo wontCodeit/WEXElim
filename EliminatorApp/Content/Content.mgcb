@@ -37,6 +37,18 @@
 /processorParam:TextureFormat=Color
 /build:bg1.jpg
 
+#begin ButtonImages/EndTurn.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ButtonImages/EndTurn.png
+
 #begin CardImages/Back.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -48,6 +60,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/Back.png
+
+#begin CardImages/Back.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/Back.png
+
+#begin CardImages/ClubsAce.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsAce.png
 
 #begin CardImages/ClubsAce.png
 /importer:TextureImporter
@@ -73,6 +109,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/ClubsEight.png
 
+#begin CardImages/ClubsEight.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsEight.png
+
 #begin CardImages/ClubsFive.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -84,6 +132,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/ClubsFive.png
+
+#begin CardImages/ClubsFive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsFive.png
+
+#begin CardImages/ClubsFour.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsFour.png
 
 #begin CardImages/ClubsFour.png
 /importer:TextureImporter
@@ -109,6 +181,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/ClubsJack.png
 
+#begin CardImages/ClubsJack.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsJack.png
+
 #begin CardImages/ClubsKing.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -120,6 +204,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/ClubsKing.png
+
+#begin CardImages/ClubsKing.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsKing.png
+
+#begin CardImages/ClubsNine.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsNine.png
 
 #begin CardImages/ClubsNine.png
 /importer:TextureImporter
@@ -145,6 +253,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/ClubsQueen.png
 
+#begin CardImages/ClubsQueen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsQueen.png
+
 #begin CardImages/ClubsSeven.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -156,6 +276,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/ClubsSeven.png
+
+#begin CardImages/ClubsSeven.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsSeven.png
+
+#begin CardImages/ClubsSix.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsSix.png
 
 #begin CardImages/ClubsSix.png
 /importer:TextureImporter
@@ -181,6 +325,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/ClubsTen.png
 
+#begin CardImages/ClubsTen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsTen.png
+
 #begin CardImages/ClubsThree.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -192,6 +348,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/ClubsThree.png
+
+#begin CardImages/ClubsThree.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsThree.png
+
+#begin CardImages/ClubsTwo.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/ClubsTwo.png
 
 #begin CardImages/ClubsTwo.png
 /importer:TextureImporter
@@ -217,6 +397,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/DiamondsAce.png
 
+#begin CardImages/DiamondsAce.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsAce.png
+
 #begin CardImages/DiamondsEight.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -228,6 +420,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/DiamondsEight.png
+
+#begin CardImages/DiamondsEight.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsEight.png
+
+#begin CardImages/DiamondsFive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsFive.png
 
 #begin CardImages/DiamondsFive.png
 /importer:TextureImporter
@@ -253,6 +469,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/DiamondsFour.png
 
+#begin CardImages/DiamondsFour.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsFour.png
+
 #begin CardImages/DiamondsJack.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -264,6 +492,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/DiamondsJack.png
+
+#begin CardImages/DiamondsJack.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsJack.png
+
+#begin CardImages/DiamondsKing.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsKing.png
 
 #begin CardImages/DiamondsKing.png
 /importer:TextureImporter
@@ -289,6 +541,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/DiamondsNine.png
 
+#begin CardImages/DiamondsNine.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsNine.png
+
 #begin CardImages/DiamondsQueen.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -300,6 +564,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/DiamondsQueen.png
+
+#begin CardImages/DiamondsQueen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsQueen.png
+
+#begin CardImages/DiamondsSeven.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsSeven.png
 
 #begin CardImages/DiamondsSeven.png
 /importer:TextureImporter
@@ -325,6 +613,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/DiamondsSix.png
 
+#begin CardImages/DiamondsSix.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsSix.png
+
 #begin CardImages/DiamondsTen.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -336,6 +636,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/DiamondsTen.png
+
+#begin CardImages/DiamondsTen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsTen.png
+
+#begin CardImages/DiamondsThree.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsThree.png
 
 #begin CardImages/DiamondsThree.png
 /importer:TextureImporter
@@ -361,6 +685,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/DiamondsTwo.png
 
+#begin CardImages/DiamondsTwo.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/DiamondsTwo.png
+
 #begin CardImages/HeartsAce.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -372,6 +708,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/HeartsAce.png
+
+#begin CardImages/HeartsAce.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsAce.png
+
+#begin CardImages/HeartsEight.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsEight.png
 
 #begin CardImages/HeartsEight.png
 /importer:TextureImporter
@@ -397,6 +757,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/HeartsFive.png
 
+#begin CardImages/HeartsFive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsFive.png
+
 #begin CardImages/HeartsFOur.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -408,6 +780,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/HeartsFOur.png
+
+#begin CardImages/HeartsFOur.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsFOur.png
+
+#begin CardImages/HeartsJack.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsJack.png
 
 #begin CardImages/HeartsJack.png
 /importer:TextureImporter
@@ -433,6 +829,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/HeartsKing.png
 
+#begin CardImages/HeartsKing.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsKing.png
+
 #begin CardImages/HeartsNine.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -444,6 +852,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/HeartsNine.png
+
+#begin CardImages/HeartsNine.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsNine.png
+
+#begin CardImages/HeartsQueen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsQueen.png
 
 #begin CardImages/HeartsQueen.png
 /importer:TextureImporter
@@ -469,6 +901,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/HeartsSeven.png
 
+#begin CardImages/HeartsSeven.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsSeven.png
+
 #begin CardImages/HeartsSix.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -480,6 +924,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/HeartsSix.png
+
+#begin CardImages/HeartsSix.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsSix.png
+
+#begin CardImages/HeartsTen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsTen.png
 
 #begin CardImages/HeartsTen.png
 /importer:TextureImporter
@@ -505,6 +973,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/HeartsThree.png
 
+#begin CardImages/HeartsThree.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsThree.png
+
 #begin CardImages/HeartsTwo.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -516,6 +996,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/HeartsTwo.png
+
+#begin CardImages/HeartsTwo.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/HeartsTwo.png
+
+#begin CardImages/JokerBlack.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/JokerBlack.png
 
 #begin CardImages/JokerBlack.png
 /importer:TextureImporter
@@ -541,6 +1045,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/JokerColour.png
 
+#begin CardImages/JokerColour.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/JokerColour.png
+
 #begin CardImages/SpadesAce.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -552,6 +1068,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/SpadesAce.png
+
+#begin CardImages/SpadesAce.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesAce.png
+
+#begin CardImages/SpadesEight.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesEight.png
 
 #begin CardImages/SpadesEight.png
 /importer:TextureImporter
@@ -577,6 +1117,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/SpadesFive.png
 
+#begin CardImages/SpadesFive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesFive.png
+
 #begin CardImages/SpadesFour.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -588,6 +1140,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/SpadesFour.png
+
+#begin CardImages/SpadesFour.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesFour.png
+
+#begin CardImages/SpadesJack.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesJack.png
 
 #begin CardImages/SpadesJack.png
 /importer:TextureImporter
@@ -613,6 +1189,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/SpadesKing.png
 
+#begin CardImages/SpadesKing.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesKing.png
+
 #begin CardImages/SpadesNine.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -624,6 +1212,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/SpadesNine.png
+
+#begin CardImages/SpadesNine.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesNine.png
+
+#begin CardImages/SpadesQueen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesQueen.png
 
 #begin CardImages/SpadesQueen.png
 /importer:TextureImporter
@@ -649,6 +1261,30 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/SpadesSeven.png
 
+#begin CardImages/SpadesSeven.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesSeven.png
+
+#begin CardImages/SpadesSix.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesSix.png
+
 #begin CardImages/SpadesSix.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -673,6 +1309,18 @@
 /processorParam:TextureFormat=Color
 /build:CardImages/SpadesTen.png
 
+#begin CardImages/SpadesTen.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesTen.png
+
 #begin CardImages/SpadesThree.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -684,6 +1332,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:CardImages/SpadesThree.png
+
+#begin CardImages/SpadesThree.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesThree.png
+
+#begin CardImages/SpadesTwo.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CardImages/SpadesTwo.png
 
 #begin CardImages/SpadesTwo.png
 /importer:TextureImporter

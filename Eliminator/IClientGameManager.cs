@@ -44,6 +44,7 @@ public interface IClientGameManager: IDisposable
     public void SendPeekPacket(ushort cardId);
     public void SendScramblePacket(byte playerId);
     public void SendCallItPacket();
+    public void SendPassItPacket();
 
     public void DoDiscardSwap(ushort cardId);
 

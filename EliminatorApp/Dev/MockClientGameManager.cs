@@ -254,5 +254,10 @@ internal class MockClientGameManager: IClientGameManager
         SendSwapPacket(cardId, _serverHM.TopDiscardCardId);
         PacketReader.ReadInternalPacket(new ProcessedDiscardResultPacket(SERVER_ID, cv));
     }
+
+    public void SendPassItPacket()
+    {
+        PacketReader.ReadInternalPacket(new ProcessedPassTurnPacket(PlayerId));
+    }
     #endregion
 }
