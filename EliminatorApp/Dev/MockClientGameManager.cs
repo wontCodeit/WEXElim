@@ -52,7 +52,7 @@ internal class MockClientGameManager: IClientGameManager
         HandManager = new((byte)igPacket.Players.Count, igPacket.StartingCards, new BlankDeck(1), _clientCardCounter);
 
         List<CardValue> firstCards = [
-            CardValue.ClubsNine, // p1, card 1 (leftmost)
+            CardValue.ClubsJack, // p1, card 1 (leftmost)
             CardValue.SpadesFive,
             CardValue.SpadesFour,
             CardValue.SpadesThree,

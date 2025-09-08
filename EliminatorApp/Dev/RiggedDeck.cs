@@ -22,26 +22,29 @@ internal class RiggedDeck: IDeck
     {
         Debug.Assert(amount > 0, "Cannot make a deck with negative or 0 cards in it.");
         StandardSizeMultiple = amount;
-        IEnumerable<CardValue> enumsNoCardBack = Enum.GetValues<CardValue>().Cast<CardValue>().Where(cv => cv != CardValue.Back);
+        var enumsNoCardBack = Enum.GetValues<CardValue>().Cast<CardValue>().Where(cv => cv != CardValue.Back).ToList();
+        var standardDeckSize = enumsNoCardBack.Count;
 
         for (var i = 0; i < amount; i++)
         {
-            IEnumerable<CardValue> enums = [.. enumsNoCardBack];
-            if (firstCards != null && firstCards.Count != 0)
+            if (firstCards == null || firstCards.Count == 0)
             {
-                enums = enums.Except(firstCards.Take(54)); // remove from enums, so no duplicates are added later
-                var limit = Math.Min(54, firstCards.Count()); // account for firstCards being longer than one deck
-                for (var j = 0; j < limit; j++)
-                {
-                    _deck.Enqueue(firstCards.First());
-                    firstCards.RemoveAt(0);
-                }
+                enumsNoCardBack.ForEach(_deck.Enqueue);
+                continue;
             }
 
-            for (var j = 0; j < enums.Count(); j++)
+            var limit = Math.Min(firstCards.Count, standardDeckSize);
+
+            // remove from enums, so no duplicates are added later
+            List<CardValue> enums = [.. enumsNoCardBack.Except(firstCards.Take(limit))];
+
+            for (var j = 0; j < limit; j++)
             {
-                _deck.Enqueue(enums.ElementAt(j));
+                _deck.Enqueue(firstCards[0]);
+                firstCards.RemoveAt(0);
             }
+
+            enums.ForEach(_deck.Enqueue);
         }
     }
 
