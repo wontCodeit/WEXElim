@@ -116,13 +116,13 @@ public class InputValidator
     }
 
     /// <summary>
-    /// Check if a player can currently Call. Calling it must end their turn.
+    /// Check if a player can currently Call. Calling it ends their turn immediately.
     /// </summary>
     /// <param name="currentState"></param>
     /// <returns></returns>
     public bool CheckCanCall(GameState currentState)
     {
-        return _isCalled ? false : currentState == GameState.TurnEnd;
+        return _isCalled ? false : CheckCanPass(currentState);
     }
 
     /// <summary>

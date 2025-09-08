@@ -68,6 +68,7 @@ internal class MockClientGameManager: IClientGameManager
             CardValue.ClubsSix,
 
             CardValue.SpadesSix];
+
         _serverHM = new((byte)igPacket.Players.Count, igPacket.StartingCards, new RiggedDeck(1, firstCards), _serverCardCounter);
 
         // We would usually use the igPacket's discard card, but in this case it doesn't align with the server deck so it is ignored
@@ -251,6 +252,7 @@ internal class MockClientGameManager: IClientGameManager
     {
         var cv = (CardValue)_serverCardCounter.GetNumber(cardId)!;
         _serverHM.ToDiscard(cv);
+        HandManager.ToDiscard(cv);
         SendSwapPacket(cardId, _serverHM.TopDiscardCardId);
         PacketReader.ReadInternalPacket(new ProcessedDiscardResultPacket(SERVER_ID, cv));
     }
