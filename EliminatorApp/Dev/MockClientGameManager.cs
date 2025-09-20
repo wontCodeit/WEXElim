@@ -251,8 +251,6 @@ internal class MockClientGameManager: IClientGameManager
     public void DoDiscardSwap(ushort cardId)
     {
         var cv = (CardValue)_serverCardCounter.GetNumber(cardId)!;
-        _serverHM.ToDiscard(cv);
-        HandManager.ToDiscard(cv);
         SendSwapPacket(cardId, _serverHM.TopDiscardCardId);
         PacketReader.ReadInternalPacket(new ProcessedDiscardResultPacket(SERVER_ID, cv));
     }
