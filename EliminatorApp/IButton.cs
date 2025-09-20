@@ -15,6 +15,11 @@ public interface IButton
     public bool Clickable { get; set; }
 
     /// <summary>
+    /// The position and rotation of this <see cref="IButton"/>
+    /// </summary>
+    public DisplaySpace DisplaySpace { get; }
+
+    /// <summary>
     /// Check whether a point lies within this <see cref="IButton"/>'s area
     /// </summary>
     /// <param name="point"> The point to test against </param>

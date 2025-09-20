@@ -208,4 +208,5 @@ public class ClientGameManager: IClientGameManager
     }
 
     public void DoDiscardSwap(ushort cardId) => throw new NotImplementedException();
+    public void SendPassItPacket() => throw new NotImplementedException();
 }

@@ -16,6 +16,7 @@ namespace EliminatorApp;
 public class Game1: Game
 {
     private const string CARD_IMG_FOLDER = "CardImages/";
+    private const string BUTTON_IMG_FOLDER = "ButtonImages/";
     private readonly GraphicsDeviceManager _graphics;
     private readonly IClientGameManager _serverComm;
     private readonly ProcessedInitialiseGamePacket _configFromServer;
@@ -25,6 +26,8 @@ public class Game1: Game
     private readonly List<IButton> _miscButtons = [];
     private DeckView _deckView;
     private DiscardPileView _discardView;
+    private BasicButton _endTurnButton;
+    private BasicButton _callItButton;
     private List<HandView> _handViews = [];
     private InputValidator _inputValidator;
 
@@ -82,6 +85,8 @@ public class Game1: Game
     public event EventHandler? InputRegistryChangedEvent;
     public event EventHandler? DeckClickedEvent;
     public event EventHandler? DiscardClickedEvent;
+    public event EventHandler? EndTurnClickedEvent;
+    public event EventHandler? CallItClickedEvent;
 
     public Game1(IClientGameManager cgm, ProcessedInitialiseGamePacket igPacket)
     {
@@ -120,8 +125,17 @@ public class Game1: Game
 
         DeckClickedEvent += OnDeckClicked;
         DiscardClickedEvent += OnDiscardClicked;
+        EndTurnClickedEvent += OnEndTurnClicked;
+        CallItClickedEvent += OnCallItClicked;
 
         base.Initialize();
+    }
+
+    private void OnCallItClicked(object? sender, EventArgs e)
+    {
+        _inputValidator.OnCalledIt(_serverComm.PlayerId);
+        _serverComm.SendCallItPacket();
+        EndTurnClickedEvent?.Invoke(sender, e);
     }
 
     private void OnDiscardClicked(object? sender, EventArgs e)
@@ -180,6 +194,17 @@ public class Game1: Game
         }
 
         DebugTextVisualiser.AddDrawMeText(sb.ToString(), Color.White, 60_000);
+
+        // Clean up everything except the server, essentially.
+        _views.ForEach(view => view.Dispose());
+        _views.Clear();
+        _handViews.Clear();
+        _miscButtons.ForEach(button => (button as IDisposable)?.Dispose());
+        _miscButtons.Clear();
+        CardTextures.ToList().ForEach(texture => texture.Value.Dispose());
+        CardTextures.Clear();
+        HighlightTextures.ToList().ForEach(texture => texture.Value.Dispose());
+        HighlightTextures.Clear();
     }
     private void OnDisplayScramble(object? sender, ProcessedDisplayScramblePacket? e)
     {
@@ -294,8 +319,24 @@ public class Game1: Game
             new RenderTarget2D(_graphics.GraphicsDevice, CARD_WIDTH, CARD_HEIGHT),
             new DisplaySpace(new((screenWidth / 2) + CARD_WIDTH + 10, (screenHeight / 2) - deckDisplayHeight), 0f));
 
+        Texture2D endTurnTexture = Content.Load<Texture2D>(BUTTON_IMG_FOLDER + "EndTurn");
+        var endTurnTextureyOffset = endTurnTexture.Height;
+        var endTurnY = screenHeight - endTurnTextureyOffset - 40;
+        var endTurnX = 0 + 10;
+        _endTurnButton = new BasicButton(
+            new DisplaySpace(new(endTurnX, endTurnY), 0f),
+            endTurnTexture,
+            EndTurnClickedEvent);
+
+        _callItButton = new BasicButton(
+            new DisplaySpace(new(endTurnX, endTurnY - endTurnTextureyOffset - 40), 0f),
+            Content.Load<Texture2D>(BUTTON_IMG_FOLDER + "CallIt"),
+            CallItClickedEvent);
+
         _miscButtons.Add(_deckView);
         _miscButtons.Add(_discardView);
+        _miscButtons.Add(_endTurnButton);
+        _miscButtons.Add(_callItButton);
         _views.Add(_deckView);
         _views.Add(_discardView);
         _views.AddRange(_handViews);
@@ -309,17 +350,7 @@ public class Game1: Game
             Exit();
         }
 
-        KeyboardState keyBoardState = Keyboard.GetState();
         MouseState cursor = Mouse.GetState();
-
-        // TODO: Remove this debugging code
-        //HandView investigate = _handViews.ToList()[2];
-        //_perceivedFinalMousePosition = new(cursor.X / _screenScale, cursor.Y / _screenScale);
-        //_perceivedFinalMousePosition -= investigate.DisplaySpace.Position;
-        //_perceivedFinalMousePosition = Vector2.RotateAround(
-        //    _perceivedFinalMousePosition,
-        //    new(investigate.View.Width / 2, investigate.View.Height / 2),
-        //    -investigate.DisplaySpace.Rotation);
 
         if (cursor.LeftButton == ButtonState.Pressed && !_inputLockLeft)
         {
@@ -426,8 +457,19 @@ public class Game1: Game
             case GameState.TurnStart:
             case GameState.TurnEnd:
             case GameState.Waiting:
-            case GameState.SwapCardInHands:
                 _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
+                return;
+
+            case GameState.SwapCardInHands:
+                if (InputRegistry.Count == 2) // both selections made
+                {
+                    _serverComm.SendSwapPacket(
+                        (ushort)InputRegistry.First().ButtonId.Value,
+                        (ushort)InputRegistry.Last().ButtonId.Value);
+                }
+
+                _gameStateMachine.FireSelectionUpdateTrigger(InputRegistry);
+
                 return;
 
             case GameState.DiscardSwap:
@@ -491,6 +533,22 @@ public class Game1: Game
                 SpriteEffects.None,
                 0f);
         });
+
+        foreach (BasicButton basicButton in _miscButtons.Where(button => button is BasicButton))
+        {
+            Color drawColor = basicButton.Clickable ? Color.White : Color.Gray;
+
+            _spriteBatch.Draw(
+                basicButton.Texture,
+                basicButton.DisplaySpace.Position,
+                null,
+                drawColor,
+                0f,
+                new(),
+                1,
+                SpriteEffects.None,
+                0f);
+        }
 
         var output = _gameStateMachine.CurrentState.ToString();
         _spriteBatch.DrawString(
@@ -562,9 +620,11 @@ public class Game1: Game
             _discardView.Clickable = _gameStateMachine.CurrentState == GameState.TurnStart;
             // Also alter the displayed discard card value if necessary
             _discardView.DisplayedDiscardValue = _serverComm.TopDiscardValue;
-        }
 
-        // TODO: pass it and call it buttons
+            // TODO: call it button
+            _endTurnButton.Clickable = _inputValidator.CheckCanPass(_gameStateMachine.CurrentState);
+            _callItButton.Clickable = _inputValidator.CheckCanCall(_gameStateMachine.CurrentState);
+        }
     }
 
     private void OnDeckClicked(object? sender, EventArgs e)
@@ -583,6 +643,12 @@ public class Game1: Game
             // We are not triggering deck click here, because when in QP only the next CardAction (or cancel) is relevant to the state machine
             _serverComm.SendQuickPlacePacket((ushort)InputRegistry.First().ButtonId.Value);
         }
+    }
+
+    private void OnEndTurnClicked(object? sender, EventArgs e)
+    {
+        _gameStateMachine.FireEndTurnTrigger();
+        _serverComm.SendPassItPacket();
     }
 
     // TODO: Clean up based on what cancelling actually requires e.g. are we calling this twice when receiving packet or nah

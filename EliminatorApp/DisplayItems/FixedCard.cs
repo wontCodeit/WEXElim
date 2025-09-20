@@ -1,14 +1,17 @@
 ﻿using Eliminator;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace EliminatorApp;
 
 /// <summary>
 /// Instances used to display cards and allow user interaction
 /// </summary>
-public class FixedCard: IButton
+public class FixedCard: IButton, IDisposable
 {
+    private bool disposedValue;
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -86,5 +89,35 @@ public class FixedCard: IButton
 
         _ = Game1.InputRegistry.Remove(this);
         Hide = false;
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                // TODO: dispose managed state (managed objects)
+                Texture.Dispose();
+            }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+            disposedValue = true;
+        }
+    }
+
+    // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+    // ~FixedCard()
+    // {
+    //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+    //     Dispose(disposing: false);
+    // }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

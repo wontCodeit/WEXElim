@@ -37,6 +37,30 @@
 /processorParam:TextureFormat=Color
 /build:bg1.jpg
 
+#begin ButtonImages/CallIt.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ButtonImages/CallIt.png
+
+#begin ButtonImages/EndTurn.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ButtonImages/EndTurn.png
+
 #begin CardImages/Back.png
 /importer:TextureImporter
 /processor:TextureProcessor

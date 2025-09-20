@@ -241,8 +241,8 @@ public class HandManager
             throw new InvalidOperationException($"Discard pile is empty");
         }
 
-        ToDiscard((CardValue)card?.Number!);
         card?.ChangeNumber((CardValue)_counter.GetNumber(TopDiscardCardId)!);
+        ToDiscard((CardValue)card?.Number!);
     }
 
     /// <summary>

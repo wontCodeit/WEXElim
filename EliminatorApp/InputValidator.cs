@@ -115,21 +115,14 @@ public class InputValidator
         }
     }
 
+    /// <summary>
+    /// Check if a player can currently Call. Calling it ends their turn immediately.
+    /// </summary>
+    /// <param name="currentState"></param>
+    /// <returns></returns>
     public bool CheckCanCall(GameState currentState)
     {
-        if (_isCalled)
-        {
-            return false;
-        }
-
-        switch (currentState)
-        {
-            case GameState.Initialisation:
-            case GameState.Waiting:
-                return false;
-            default:
-                return true;
-        }
+        return _isCalled ? false : CheckCanPass(currentState);
     }
 
     /// <summary>
@@ -154,20 +147,21 @@ public class InputValidator
             return playerIds;
         }
 
-        List<byte> playersInNewOrder = [_callItPlayerId!.Value];
-        for (var i = 1; i < playerIds.Count; i++)
-        {
-            playersInNewOrder.Add(GetNextPlayerId(playersInNewOrder[-1]));
-        }
-
-        var indexOfCurrentPlayer = playersInNewOrder.FindIndex(id => id == currentPlayerId);
         try
         {
+            List<byte> playersInNewOrder = [_callItPlayerId!.Value];
+            for (var i = 1; i < playerIds.Count; i++)
+            {
+                playersInNewOrder.Add(GetNextPlayerId(playersInNewOrder[-1]));
+            }
+
+            var indexOfCurrentPlayer = playersInNewOrder.FindIndex(id => id == currentPlayerId);
+
             return playersInNewOrder.Slice(indexOfCurrentPlayer, playerIds.Count);
         }
         catch (Exception ex) when (ex is ArgumentOutOfRangeException)
         {
-            return [];
+            return []; // No player is valid to start- expect a GameEnd packet from server shortly
         }
     }
 
