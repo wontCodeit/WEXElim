@@ -1,5 +1,4 @@
-﻿using Eliminator;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
@@ -28,11 +27,6 @@ public class FixedCard: IButton, IDisposable
     public DisplaySpace DisplaySpace { get; set; }
 
     /// <summary>
-    /// The <see cref="Card"/> that this <see cref="FixedCard"/> represents
-    /// </summary>
-    public ICard RepresentedCard { get; }
-
-    /// <summary>
     /// Set to true to prevent this <see cref="FixedCard"/> being drawn
     /// </summary>
     public bool Hide { get; set; } = false;
@@ -40,25 +34,18 @@ public class FixedCard: IButton, IDisposable
     /// <summary>
     /// The <see cref="Texture2D"/> used to draw this <see cref="FixedCard"/>
     /// </summary>
-    public Texture2D Texture
-    {
-        get
-        {
-            CardValue? cardValue = RepresentedCard.Number;
-            return cardValue is null ? Game1.NoTexture : Game1.CardTextures[cardValue.Value];
-        }
-    }
+    public Texture2D Texture { get; }
 
     /// <summary>
     /// Creates a <see cref="FixedCard"/>
     /// </summary>
     /// <param name="card"> The card that this instance will represent </param>
     /// <param name="displaySpace"> The space this card will initially occupy </param>
-    public FixedCard(ICard card, DisplaySpace displaySpace)
+    public FixedCard(ushort cardId, DisplaySpace displaySpace, Texture2D texture)
     {
-        RepresentedCard = card;
         DisplaySpace = displaySpace;
-        ButtonId = new(card.Id);
+        ButtonId = new(cardId);
+        Texture = texture;
     }
 
     /// <summary>
@@ -98,7 +85,7 @@ public class FixedCard: IButton, IDisposable
             if (disposing)
             {
                 // TODO: dispose managed state (managed objects)
-                Texture.Dispose();
+                Texture.Dispose(); // TODO: This might not need disposing of
             }
 
             // TODO: free unmanaged resources (unmanaged objects) and override finalizer

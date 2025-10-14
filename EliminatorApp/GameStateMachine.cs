@@ -148,7 +148,9 @@ public class GameStateMachine
 
         foreach (var handId in _handManager.PlayerIds().Where(hand => hand != _userId))
         {
-            if (_handManager.GetCardsInHand(handId).Select(card => card.Id).Contains(card.RepresentedCard.Id))
+            if (_handManager.GetCardsInHand(handId)
+                    .Select(card => card.Id)
+                    .Contains((ushort)card.ButtonId.Value))
             {
                 return true;
             }

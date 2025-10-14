@@ -106,9 +106,6 @@ public class Game1: Game
         Debug.Assert(_serverComm.HandManager != null,
             "ClientGameManager should be initialised prior to Game initialisation");
         _gameStateMachine = new(_serverComm.HandManager, _serverComm.PlayerId);
-        _handViews = [.. MakeHandViews()];
-        _arial = Content.Load<SpriteFont>("MyTextFont");
-        _debugTextView = new(_graphics.GraphicsDevice, 300, 300);
 
         _inputValidator = new InputValidator(_serverComm.HandManager);
 
@@ -249,23 +246,23 @@ public class Game1: Game
         }
 
         HandView qpPlayer = _handViews.First(hand => hand.HandID == quickPlaceResultPacket!.PlayerId);
-        var cardsInView = qpPlayer.DisplayCards.Select(dcard => dcard.RepresentedCard).ToList();
+        var cardsInView = qpPlayer.DisplayCards.Select(dcard => dcard.ButtonId).ToList();
         List<ICard> cardsInHand = _serverComm.HandManager.GetCardsInHand(quickPlaceResultPacket!.PlayerId);
         if (quickPlaceResultPacket!.Result == QuickPlaceResult.Success)
         {
             DebugTextVisualiser.AddDrawMeText("OnQuickPlaceResult:: SUCCESS!", Color.Green, 360);
-            ICard cardRemoved = cardsInView.First(card => card.Id == quickPlaceResultPacket.CardId);
-            _ = qpPlayer.RemoveFixedCard(cardRemoved);
+            _ = qpPlayer.RemoveFixedCard(cardsInView.First(card =>
+                (ushort)card.Value == quickPlaceResultPacket.CardId));
 
             return;
         }
 
         DebugTextVisualiser.AddDrawMeText("OnQuickPlaceResult:: PUNISHMENT!", Color.Red, 360);
 
-        IEnumerable<ICard> cardToAdd = cardsInHand.ExceptBy(cardsInView, c => c, new CardIdComparer());
-        foreach (ICard card in cardToAdd)
+        IEnumerable<ushort> cardToAdd = cardsInHand.Select(ch => ch.Id).ExceptBy(cardsInView.Select(cv => cv.Value), ch => ch);
+        foreach (var cardId in cardToAdd)
         {
-            _ = qpPlayer.AddFixedCard(card);
+            _ = qpPlayer.AddFixedCard(cardId);
         }
 
         // Exit the quick place state. This is important when going from 1 card in deck to 0, as we need to revalidate
@@ -302,6 +299,10 @@ public class Game1: Game
         HighlightTextures[Color.Gray] = CreateBorderedTexture(_graphics.GraphicsDevice, 64, 96, 5, Color.Gray, Color.Transparent);
         HighlightTextures[Color.Orange] = CreateBorderedTexture(_graphics.GraphicsDevice, 64, 96, 5, Color.Orange, Color.Transparent);
         HighlightTextures[Color.Green] = CreateBorderedTexture(_graphics.GraphicsDevice, 64, 96, 5, Color.Green, Color.Transparent);
+
+        _handViews = [.. MakeHandViews()];
+        _arial = Content.Load<SpriteFont>("MyTextFont");
+        _debugTextView = new(_graphics.GraphicsDevice, 300, 300);
 
         var deckDisplayHeight = CARD_HEIGHT + 20;
         _deckView = new DeckView(
@@ -600,7 +601,7 @@ public class Game1: Game
         var allHandsCards = _handViews.SelectMany(hand => hand.DisplayCards).ToList();
         allHandsCards.ForEach(card =>
         {
-            card.Clickable = validIds.Contains(card.RepresentedCard.Id);
+            card.Clickable = validIds.Contains(card.ButtonId.Value);
         });
 
         IEnumerable<IButton> nonCardButtons = [.. _miscButtons];
@@ -818,7 +819,7 @@ public class Game1: Game
                 assignPlayerId -= (byte)(_serverComm.PlayerId + 1);
             }
 
-            views.Add(new(_serverComm.HandManager.GetCardsInHand(assignPlayerId),
+            views.Add(new(_serverComm.HandManager.GetCardsInHand(assignPlayerId).Select(card => card.Id),
                           new(_graphics.GraphicsDevice, 300, 300),
                           spaces[i],
                           assignPlayerId));

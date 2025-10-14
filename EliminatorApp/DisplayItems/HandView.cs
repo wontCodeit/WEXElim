@@ -1,5 +1,4 @@
-﻿using Eliminator;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +50,7 @@ public class HandView: ICardContainer, IButton
     /// <param name="space"></param>
     /// <param name="handId"></param>
     public HandView(
-        IEnumerable<ICard> cards,
+        IEnumerable<ushort> cardIds,
         RenderTarget2D view,
         DisplaySpace space,
         byte handId)
@@ -61,9 +60,9 @@ public class HandView: ICardContainer, IButton
         HandID = handId;
         ButtonId = new();
 
-        foreach (ICard card in cards)
+        foreach (var id in cardIds)
         {
-            _ = AddFixedCard(card);
+            _ = AddFixedCard(id);
         }
     }
 
@@ -72,9 +71,9 @@ public class HandView: ICardContainer, IButton
     /// </summary>
     /// <param name="card"> The <see cref="Card"/> that the <see cref="FixedCard"/> that will be removed represents </param>
     /// <returns> Whether the <see cref="Card"/> was found and by extension whether the <see cref="FixedCard"/> was removed </returns>
-    public bool RemoveFixedCard(ICard card)
+    public bool RemoveFixedCard(ushort cardId)
     {
-        if (!_displayCards.Select(dcard => dcard.RepresentedCard.Id).Contains(card.Id))
+        if (!_displayCards.Select(dcard => dcard.ButtonId.Value).Contains(cardId))
         {
             return false;
         }
@@ -85,7 +84,7 @@ public class HandView: ICardContainer, IButton
         for (var i = 0; i < _displayCards.Count; i++)
         {
             FixedCard consideredCard = _displayCards[i];
-            if (consideredCard.RepresentedCard.Id != card.Id)
+            if (consideredCard.ButtonId.Value != cardId)
             {
                 continue;
             }
@@ -104,21 +103,25 @@ public class HandView: ICardContainer, IButton
         return true;
     }
 
+    public bool RemoveFixedCard(ButtonId cardId) => RemoveFixedCard((ushort)cardId.Value);
+
     /// <summary>
     /// Adds a new <see cref="FixedCard"/> to the <see cref="DisplayCards"/> of this instance
     /// </summary>
     /// <param name="card"> The <see cref="Card"/> to make a <see cref="FixedCard"/> from </param>
     /// <returns> The <see cref="FixedCard"/> instance that was just added </returns>
-    public FixedCard AddFixedCard(ICard card)
+    public FixedCard AddFixedCard(ushort cardId)
     {
         (DisplaySpace space, var index) = TakeNextInternalSpace();
 
-        var fcardToAdd = new FixedCard(card, space);
+        var fcardToAdd = new FixedCard(cardId, space, Game1.CardTextures[Eliminator.CardValue.Back]);
 
         _displayCards.Insert(index, fcardToAdd);
 
         return fcardToAdd;
     }
+
+    public FixedCard AddFixedCard(ButtonId cardId) => AddFixedCard((ushort)cardId.Value);
 
     /// <summary>
     /// Find the next <see cref="DisplaySpace"/> that the next given <see cref="Card"/> will be sent to
@@ -295,7 +298,7 @@ public class HandView: ICardContainer, IButton
         _displayCards.Clear();
         currentCards.ForEach(fcardToAdd =>
         {
-            FixedCard addedCard = AddFixedCard(fcardToAdd.RepresentedCard);
+            FixedCard addedCard = AddFixedCard(fcardToAdd.ButtonId);
             addedCard.Clickable = fcardToAdd.Clickable;
             addedCard.Hide = fcardToAdd.Hide;
         });
